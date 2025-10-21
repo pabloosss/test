@@ -1,1 +1,62 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Test wysyłki PDF</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 16px}
+    form{display:grid;gap:12px}
+    input,textarea,button{padding:10px;font-size:16px}
+    button{cursor:pointer}
+    .row{display:grid;gap:8px}
+    .hint{color:#666;font-size:12px}
+    .ok{color:green}.err{color:#b00}
+  </style>
+</head>
+<body>
+  <h1>Test wysyłki PDF na e-mail</h1>
+  <form id="f">
+    <div class="row">
+      <label>Adres odbiorcy (to)</label>
+      <input name="to" type="email" placeholder="odbiorca@domena.pl" required />
+    </div>
+    <div class="row">
+      <label>Temat</label>
+      <input name="subject" type="text" placeholder="Test wysyłki PDF" />
+    </div>
+    <div class="row">
+      <label>Wiadomość (też wejdzie do PDF)</label>
+      <textarea name="message" rows="6" placeholder="To jest test."></textarea>
+    </div>
+    <button type="submit">Wyślij</button>
+    <div class="hint">Endpoint: POST /send</div>
+    <div id="out"></div>
+  </form>
+<script>
+const f = document.getElementById("f");
+const out = document.getElementById("out");
+f.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  out.textContent = "Wysyłam...";
+  const data = Object.fromEntries(new FormData(f).entries());
+  try{
+    const r = await fetch("/send", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(data)
+    });
+    const j = await r.json();
+    if(j.ok){
+      out.innerHTML = `<div class="ok">OK. ID: ${j.messageId}</div>`;
+    } else {
+      out.innerHTML = `<div class="err">Błąd: ${j.error || "unknown"}</div>`;
+    }
+  }catch(err){
+    out.innerHTML = `<div class="err">Błąd sieci: ${err}</div>`;
+  }
+});
+</script>
+</body>
+</html>
 
