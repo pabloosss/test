@@ -1,7 +1,8 @@
+// server.js
 import express from "express";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import PDFDocument from "pdfkit";
+import { Resend } from "resend";
 
 dotenv.config();
 
@@ -11,13 +12,15 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const {
-  SMTP_HOST,
-  SMTP_PORT,
-  SMTP_SECURE,     // "true" albo "false"
-  SMTP_USER,
-  SMTP_PASS,
-  MAIL_FROM        // np. "IT <it@twojadomena.pl>"
+  RESEND_API_KEY,
+  MAIL_FROM, // np. "Emerlog Test <onboarding@resend.dev>" albo zweryfikowana domena
 } = process.env;
+
+if (!RESEND_API_KEY) {
+  console.warn("Brak RESEND_API_KEY w env. Wysyłka nie zadziała.");
+}
+
+const resend = new Resend(RESEND_API_KEY);
 
 function genPdfBuffer({ title, body }) {
   return new Promise((resolve, reject) => {
@@ -34,22 +37,9 @@ function genPdfBuffer({ title, body }) {
   });
 }
 
-function buildTransporter() {
-  return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT || 587),
-    secure: String(SMTP_SECURE || "false") === "true",
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS
-    }
-  });
-}
-
 app.post("/send", async (req, res) => {
   try {
     const { to, subject, message } = req.body;
-
     if (!to) return res.status(400).json({ ok: false, error: "Brak pola 'to'." });
 
     const pdf = await genPdfBuffer({
@@ -57,23 +47,24 @@ app.post("/send", async (req, res) => {
       body: message || "Treść testowa PDF."
     });
 
-    const transporter = buildTransporter();
-
-    const info = await transporter.sendMail({
-      from: MAIL_FROM || SMTP_USER,
+    const result = await resend.emails.send({
+      from: MAIL_FROM || "Emerlog Test <onboarding@resend.dev>",
       to,
       subject: subject || "Test wysyłki PDF",
-      text: message || "W załączniku PDF.",
+      html: `<p>${(message || "W załączniku PDF.").replace(/</g, "&lt;")}</p>`,
       attachments: [
         {
           filename: "raport-godzin.pdf",
-          content: pdf,
-          contentType: "application/pdf"
+          content: pdf.toString("base64")
         }
       ]
     });
 
-    res.json({ ok: true, messageId: info.messageId });
+    if (result.error) {
+      return res.status(500).json({ ok: false, error: result.error.message || "Resend error" });
+    }
+
+    res.json({ ok: true, id: result.data?.id || null });
   } catch (e) {
     console.error(e);
     res.status(500).json({ ok: false, error: String(e.message || e) });
