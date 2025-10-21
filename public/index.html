@@ -11,7 +11,8 @@
     button{cursor:pointer}
     .row{display:grid;gap:8px}
     .hint{color:#666;font-size:12px}
-    .ok{color:green}.err{color:#b00}
+    .ok{color:green}.err{color:#b00;white-space:pre-wrap}
+    code{background:#f3f3f3;padding:2px 4px;border-radius:4px}
   </style>
 </head>
 <body>
@@ -26,16 +27,28 @@
       <input name="subject" type="text" placeholder="Test wysyłki PDF" />
     </div>
     <div class="row">
-      <label>Wiadomość (też wejdzie do PDF)</label>
+      <label>Wiadomość (również w PDF)</label>
       <textarea name="message" rows="6" placeholder="To jest test."></textarea>
     </div>
     <button type="submit">Wyślij</button>
-    <div class="hint">Endpoint: POST /send</div>
+    <div class="hint">
+      Backend: <code>POST /send</code> • Health: <a href="/healthz" target="_blank">/healthz</a>
+    </div>
     <div id="out"></div>
   </form>
+
 <script>
 const f = document.getElementById("f");
 const out = document.getElementById("out");
+
+async function parseSmart(r){
+  const ct = r.headers.get("content-type") || "";
+  if (ct.includes("application/json")) return await r.json();
+  const text = await r.text();
+  // zwróć „pseudo JSON” gdy przyszło HTML (aby nie rzucać SyntaxError)
+  return { ok: false, error: `Non-JSON response (${r.status}):\n` + text.slice(0,1000) };
+}
+
 f.addEventListener("submit", async (e) => {
   e.preventDefault();
   out.textContent = "Wysyłam...";
@@ -43,20 +56,19 @@ f.addEventListener("submit", async (e) => {
   try{
     const r = await fetch("/send", {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
+      headers: { "Content-Type":"application/json" },
       body: JSON.stringify(data)
     });
-    const j = await r.json();
-    if(j.ok){
-      out.innerHTML = `<div class="ok">OK. ID: ${j.messageId}</div>`;
+    const j = await parseSmart(r);
+    if (j.ok) {
+      out.innerHTML = `<div class="ok">OK. ID: ${j.id || "(brak)"}.</div>`;
     } else {
       out.innerHTML = `<div class="err">Błąd: ${j.error || "unknown"}</div>`;
     }
   }catch(err){
-    out.innerHTML = `<div class="err">Błąd sieci: ${err}</div>`;
+    out.innerHTML = `<div class="err">Błąd sieci: ${String(err)}</div>`;
   }
 });
 </script>
 </body>
 </html>
-
