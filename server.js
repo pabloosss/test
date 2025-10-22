@@ -1,4 +1,5 @@
-// server.js — wersja pod Brevo API (HTTPS, działa na Render Free)
+// server.js — wersja poprawiona pod Brevo API (HTTPS, działa na Render Free)
+
 import express from "express";
 import dotenv from "dotenv";
 import PDFDocument from "pdfkit";
@@ -12,6 +13,11 @@ app.use(express.static("public"));
 
 const { BREVO_API_KEY, MAIL_FROM } = process.env;
 
+// Loguj czy klucze istnieją
+console.log("BREVO_API_KEY present:", !!BREVO_API_KEY);
+console.log("MAIL_FROM:", MAIL_FROM);
+
+// Funkcja do generowania PDF-a
 function genPdfBuffer({ title, body }) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: "A4", margin: 40 });
@@ -27,8 +33,8 @@ function genPdfBuffer({ title, body }) {
   });
 }
 
+// Parser nadawcy ("Nazwa <email@domena>" lub sam email)
 function parseSender(mailFrom) {
-  // akceptuje "Nazwa <email@domena>" lub sam email
   const m = /<(.*?)>/.exec(mailFrom || "");
   const email = m ? m[1] : (mailFrom || "no-reply@example.com");
   const n = /^(.*?)</.exec(mailFrom || "");
@@ -36,6 +42,7 @@ function parseSender(mailFrom) {
   return { name, email };
 }
 
+// Endpoint wysyłki PDF-a
 app.post("/send", async (req, res) => {
   try {
     if (!BREVO_API_KEY) return res.status(500).json({ ok: false, error: "Brak BREVO_API_KEY" });
@@ -59,7 +66,7 @@ app.post("/send", async (req, res) => {
         "content-type": "application/json"
       },
       body: JSON.stringify({
-        sender,                          // { name, email } — email musi być zweryfikowany w Brevo
+        sender,
         to: [{ email: to }],
         subject: subject || "Test wysyłki PDF",
         textContent: message || "W załączniku PDF.",
@@ -70,14 +77,21 @@ app.post("/send", async (req, res) => {
     });
 
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) return res.status(502).json({ ok: false, error: data?.message || JSON.stringify(data) });
 
+    if (!r.ok) {
+      console.error("Błąd Brevo:", data);
+      return res.status(502).json({ ok: false, error: data?.message || JSON.stringify(data) });
+    }
+
+    console.log("Wysłano:", data);
     return res.json({ ok: true, response: data });
   } catch (e) {
+    console.error("Błąd serwera:", e);
     return res.status(500).json({ ok: false, error: String(e.message || e) });
   }
 });
 
+// Endpoint testowy
 app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
 
 const PORT = process.env.PORT || 3000;
