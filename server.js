@@ -1,98 +1,65 @@
-// server.js — wersja poprawiona pod Brevo API (HTTPS, działa na Render Free)
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+require("dotenv").config();
 
-import express from "express";
-import dotenv from "dotenv";
-import PDFDocument from "pdfkit";
-
-dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
+// Fallback fetch
+const fetchFn =
+  (typeof fetch !== "undefined" && fetch) ||
+  ((...args) => import("node-fetch").then(m => m.default(...args)));
 
-const { BREVO_API_KEY, MAIL_FROM } = process.env;
+const MAIL_TO = process.env.MAIL_TO || "pawel.ruchlicki@emerlog.eu";
+const MAIL_FROM = process.env.MAIL_FROM || "Emerlog <no-reply@emerlog.eu>";
+const BREVO_API_KEY = process.env.BREVO_API_KEY || process.env.BREVO_API || "";
 
-// Loguj czy klucze istnieją
-console.log("BREVO_API_KEY present:", !!BREVO_API_KEY);
-console.log("MAIL_FROM:", MAIL_FROM);
-
-// Funkcja do generowania PDF-a
-function genPdfBuffer({ title, body }) {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: "A4", margin: 40 });
-    const chunks = [];
-    doc.on("data", c => chunks.push(c));
-    doc.on("end", () => resolve(Buffer.concat(chunks)));
-    doc.on("error", reject);
-
-    doc.fontSize(18).text(title || "Raport godzin – test", { underline: true });
-    doc.moveDown();
-    doc.fontSize(12).text(body || "To jest plik testowy PDF.");
-    doc.end();
-  });
+function parseFrom(raw) {
+  const m = /^(.*)<([^>]+)>$/.exec(raw);
+  return m ? { name: m[1].trim(), email: m[2].trim() } : { name: raw, email: raw };
 }
+const SENDER = parseFrom(MAIL_FROM);
 
-// Parser nadawcy ("Nazwa <email@domena>" lub sam email)
-function parseSender(mailFrom) {
-  const m = /<(.*?)>/.exec(mailFrom || "");
-  const email = m ? m[1] : (mailFrom || "no-reply@example.com");
-  const n = /^(.*?)</.exec(mailFrom || "");
-  const name = n ? n[1].trim() : "Mailer";
-  return { name, email };
-}
+app.use(cors());
+app.use(express.json({ limit: "100mb" }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Endpoint wysyłki PDF-a
-app.post("/send", async (req, res) => {
+app.get("/test", (_req, res) => res.json({ ok: true }));
+
+app.post("/send-pdf", async (req, res) => {
   try {
-    if (!BREVO_API_KEY) return res.status(500).json({ ok: false, error: "Brak BREVO_API_KEY" });
-    if (!MAIL_FROM) return res.status(500).json({ ok: false, error: "Brak MAIL_FROM" });
+    const { name, pdfData } = req.body || {};
+    if (!name || !pdfData) return res.status(400).json({ ok: false, error: "BRK_DANYCH" });
+    if (!BREVO_API_KEY) return res.status(500).json({ ok: false, error: "BRK_BREVO_API_KEY" });
 
-    const { to, subject, message } = req.body || {};
-    if (!to) return res.status(400).json({ ok: false, error: "Brak pola 'to'" });
+    const payload = {
+      sender: { name: SENDER.name, email: SENDER.email },
+      to: [{ email: MAIL_TO, name: "Paweł Ruchlicki" }],
+      subject: `Rozliczenie godzin – ${name}`,
+      htmlContent:
+        `<p>Dzień dobry,<br> w załączniku rozliczenie godzin dla <b>${name}</b>.</p><p>Pozdrawiamy,<br>Emerlog</p>`,
+      attachment: [{ name: "Tabela_Godzinowa.pdf", content: pdfData }]
+    };
 
-    const pdf = await genPdfBuffer({
-      title: subject || "Test PDF",
-      body: message || "Treść testowa PDF."
-    });
-
-    const sender = parseSender(MAIL_FROM);
-
-    const r = await fetch("https://api.brevo.com/v3/smtp/email", {
+    const resp = await fetchFn("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
         accept: "application/json",
-        "api-key": BREVO_API_KEY,
-        "content-type": "application/json"
+        "content-type": "application/json",
+        "api-key": BREVO_API_KEY
       },
-      body: JSON.stringify({
-        sender,
-        to: [{ email: to }],
-        subject: subject || "Test wysyłki PDF",
-        textContent: message || "W załączniku PDF.",
-        attachment: [
-          { name: "raport-godzin.pdf", content: pdf.toString("base64") }
-        ]
-      })
+      body: JSON.stringify(payload)
     });
 
-    const data = await r.json().catch(() => ({}));
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) return res.status(502).json({ ok: false, error: data?.message || "BREVO_FAILED" });
 
-    if (!r.ok) {
-      console.error("Błąd Brevo:", data);
-      return res.status(502).json({ ok: false, error: data?.message || JSON.stringify(data) });
-    }
-
-    console.log("Wysłano:", data);
-    return res.json({ ok: true, response: data });
+    res.json({ ok: true, messageId: data?.messageId || null });
   } catch (e) {
-    console.error("Błąd serwera:", e);
-    return res.status(500).json({ ok: false, error: String(e.message || e) });
+    console.error("send-pdf error:", e);
+    res.status(500).json({ ok: false, error: "SERVER_ERROR" });
   }
 });
 
-// Endpoint testowy
-app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+app.listen(PORT, () => console.log(`Serwer: ${PORT}`));
