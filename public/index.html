@@ -7,7 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22>🕒</text></svg>">
-<style>
+<style id="sheet-css">
 :root{--ink:#111;--muted:#555;--grid:#000;--off-bg:#ffcccc;--off-ink:#a00;--thead:#fafafa;--paper:#fff}
 html,body{background:#f5f7fb;color:var(--ink)}
 .container{max-width:1040px}
@@ -15,12 +15,16 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
 .brand{font-weight:700}
 .card{border:1px solid #e5e7eb;border-radius:12px}
 .card-header{background:#fff;border-bottom:1px solid #e5e7eb;font-weight:600}
+
+/* arkusz */
 .sheet-wrap{background:var(--paper);border:1px solid var(--grid);border-radius:10px;overflow:hidden}
 .sheet-head{padding:16px 18px 8px 18px;border-bottom:1px solid var(--grid)}
 .sheet-head .mname{font-size:24px;font-weight:800;margin:0}
 .sheet-head .person{font-size:18px;font-weight:700;margin:2px 0 0}
 .sheet-head .ctype{font-size:12px;color:var(--muted);margin:0}
-.table-times{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--paper)}
+
+/* tabela */
+.table-times{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--paper);font-family: Arial, Helvetica, sans-serif}
 .table-times th,.table-times td{border:1px solid var(--grid);padding:8px 10px;text-align:center;vertical-align:middle;background:#fff;font-size:14px}
 .table-times thead th{background:var(--thead);font-weight:700}
 .table-times .col-day{width:56px}
@@ -30,9 +34,14 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
 .table-times .col-sign{width:160px}
 .table-times .col-leave{width:110px}
 .mono{font-variant-numeric:tabular-nums}
-.table-times tr.off td{background:var(--off-bg);color:var(--off-ink);font-weight:700}
+.table-times tr.off td{background:var(--off-bg);color:var(--off-ink);font-weight:700 !important}
 .table-times tfoot td{font-weight:800;background:#fff}
-@media print{body{background:#fff}.card,.sheet-wrap{box-shadow:none}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+@media print{
+  body{background:#fff}
+  .card,.sheet-wrap{box-shadow:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -126,8 +135,8 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- POPRAWNY UMD DOCX -->
-<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<!-- HTML -> DOCX (1:1 z CSS) -->
+<script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
 
 <script>
 (()=>{"use strict";
@@ -136,7 +145,7 @@ const MIN_START=7, MAX_END=20;
 const MIN_H=4, MAX_H=16;
 const monthNames=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
 let customHolidays=[];
-let _lastSheetData=null, _lastMeta=null;
+let _lastSheetHTML=null; // pełny HTML arkusza do Worda
 
 /* Utils */
 const ri=(a,b)=>{a=Math.ceil(a);b=Math.floor(b);return Math.floor(Math.random()*(b-a+1))+a;}
@@ -237,7 +246,7 @@ function assignTimes(days,hoursArr){
   }
 }
 
-/* UI */
+/* UI helpers */
 function updateRanges(){
   const m=+document.getElementById("month").value||0, y=+document.getElementById("year").value||0;
   const pick=document.getElementById("holidayPicker");
@@ -258,6 +267,7 @@ function renderHolidays(){
   }
 }
 
+/* INIT */
 document.addEventListener("DOMContentLoaded", ()=>{
   document.getElementById("addHoliday").addEventListener("click", ()=>{
     const d=document.getElementById("holidayPicker").value;
@@ -279,7 +289,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   document.getElementById("generateWord").addEventListener("click", generateWord);
 });
 
-/* GENERATE */
+/* GENERATE + cache HTML do DOCX */
 function generate(){
   const name=document.getElementById("name").value.trim();
   const m=+document.getElementById("month").value;
@@ -372,24 +382,17 @@ function generate(){
     <tbody>${rows.join("")}</tbody>
     <tfoot><tr><td colspan="4">Suma</td><td class="mono">${sum}</td><td colspan="3"></td></tr></tfoot>
   </table>`;
+
   document.getElementById("output").innerHTML=table;
   document.getElementById("resultWrap").style.display='block';
   document.getElementById("generatePDF").disabled=false;
   document.getElementById("sendPDFEmail").disabled=false;
   document.getElementById("generateWord").disabled=false;
 
-  _lastSheetData = dayData.map(d=>{
-    const dd=String(d.day).padStart(2,'0'), mm=String(m).padStart(2,'0'), yyyy=y;
-    const wkd=d.date.toLocaleString('pl-PL',{weekday:'short'});
-    const urlop = d.isWorkingDay ? "-" : (d.holidayType==="Święto" ? "Święto" : "-");
-    return {
-      off: !d.isWorkingDay,
-      cells: [ String(d.day), `${dd}.${mm}.${yyyy} (${wkd})`, d.start, d.end, String(d.hours), last, "", urlop ]
-    };
-  });
-  _lastMeta = { monthName: monthNames[m-1], year: y, fullName: name, lastName: last,
-                contractLabel: (type==="praca" ? "Umowa o pracę" : type==="praca3/4" ? "Umowa o pracę (3/4)" : "Umowa zlecenie"),
-                sum };
+  // zbuduj pełny HTML + CSS dla DOCX (1:1)
+  const css = document.getElementById("sheet-css").outerHTML;
+  const sheetHTML = document.getElementById("resultWrap").outerHTML;
+  _lastSheetHTML = `<!DOCTYPE html><html><head><meta charset="utf-8">${css}</head><body>${sheetHTML}</body></html>`;
 }
 
 /* PDF */
@@ -437,57 +440,10 @@ async function sendPDFEmail(){
   }
 }
 
-/* DOCX */
+/* DOCX 1:1 */
 async function generateWord(){
-  if(!_lastSheetData || !_lastMeta){ alert("Najpierw wygeneruj tabelę."); return; }
-  const lib = window.docx;
-  if(!lib){ alert("Błąd biblioteki DOCX. Odśwież stronę."); return; }
-
-  const { Document, Packer, Paragraph, Table, TableRow, TableCell,
-          WidthType, AlignmentType, TextRun, ShadingType, BorderStyle } = lib;
-
-  const header = new Paragraph({
-    alignment: AlignmentType.LEFT,
-    children: [
-      new TextRun({ text: `${_lastMeta.monthName} ${_lastMeta.year}\n`, bold: true, size: 28 }),
-      new TextRun({ text: `${_lastMeta.fullName}\n`, bold: true, size: 26 }),
-      new TextRun({ text: `${_lastMeta.contractLabel}`, size: 20, color: "555555" })
-    ]
-  });
-
-  const makeCell = (text, opts={}) => new TableCell({
-    children: [ new Paragraph({ alignment: AlignmentType.CENTER, children: [ new TextRun({ text: text ?? "", bold: !!opts.bold }) ] }) ],
-    shading: opts.shading ? { type: ShadingType.CLEAR, color: "000000", fill: opts.shading } : undefined,
-    width: { size: 1, type: WidthType.AUTO },
-    borders: {
-      top:{ style: BorderStyle.SINGLE, size: 4, color: "000000" },
-      bottom:{ style: BorderStyle.SINGLE, size: 4, color: "000000" },
-      left:{ style: BorderStyle.SINGLE, size: 4, color: "000000" },
-      right:{ style: BorderStyle.SINGLE, size: 4, color: "000000" }
-    }
-  });
-
-  const headerRow = new TableRow({ children: [
-    makeCell("Dzień",{bold:true}), makeCell("Data",{bold:true}),
-    makeCell("Godz. rozpoczęcia",{bold:true}), makeCell("Godz. zakończenia",{bold:true}),
-    makeCell("Suma godzin",{bold:true}), makeCell("Podpis zleceniobiorcy",{bold:true}),
-    makeCell("Podpis zleceniodawcy",{bold:true}), makeCell("Urlop",{bold:true})
-  ]});
-
-  const bodyRows = _lastSheetData.map(r => new TableRow({
-    children: r.cells.map(c => makeCell(String(c), { shading: r.off ? "FFCCCC" : undefined }))
-  }));
-
-  const footerRow = new TableRow({ children: [
-    makeCell("Suma",{bold:true}), makeCell(""), makeCell(""), makeCell(""),
-    makeCell(String(_lastMeta.sum),{bold:true}), makeCell(""), makeCell(""), makeCell("")
-  ]});
-
-  const table = new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [headerRow, ...bodyRows, footerRow] });
-
-  const doc = new Document({ sections: [{ properties: { page: { margin: { top:720,right:720,bottom:720,left:720 } } }, children: [header, new Paragraph({ text:"" }), table] }] });
-
-  const blob = await Packer.toBlob(doc);
+  if(!_lastSheetHTML){ alert("Najpierw wygeneruj tabelę."); return; }
+  const blob = window.htmlDocx.asBlob(_lastSheetHTML, { orientation: "portrait" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url; a.download = "Tabela_Godzinowa.docx";
