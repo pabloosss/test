@@ -11,7 +11,7 @@ const fetchFn =
   (typeof fetch !== "undefined" && fetch) ||
   ((...args) => import("node-fetch").then(m => m.default(...args)));
 
-const MAIL_TO = process.env.MAIL_TO || "pawel.ruchlicki@emerlog.eu";
+const MAIL_TO = process.env.MAIL_TO || "ewa.dusinska@emerlog.eu";
 const MAIL_FROM = process.env.MAIL_FROM || "Emerlog <no-reply@emerlog.eu>";
 const BREVO_API_KEY = process.env.BREVO_API_KEY || process.env.BREVO_API || "";
 
