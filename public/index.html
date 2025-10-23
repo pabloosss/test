@@ -36,6 +36,10 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
 .table-times tr.off td{background:var(--off-bg);color:var(--off-ink);font-weight:700}
 .table-times tfoot td{font-weight:800;background:#fff}
 
+/* overlay opcjonalny */
+#sendingOverlay{position:fixed;inset:0;background:rgba(255,255,255,.6);backdrop-filter:saturate(120%) blur(1px);display:none;align-items:center;justify-content:center;z-index:1050}
+#sendingOverlay .box{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px;display:flex;gap:10px;align-items:center}
+
 @media print{
   body{background:#fff}
   .card,.sheet-wrap{box-shadow:none}
@@ -49,7 +53,7 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
     <div class="brand h5 m-0">
       <i class="fas fa-clock me-2 text-primary"></i>Generator Godzin Emerlog
     </div>
-    <a href="wnioski.html" id="adminLink" class="btn btn-outline-secondary btn-sm">
+    <a href="wnioski.html" class="btn btn-outline-secondary btn-sm">
       <i class="fa fa-user-shield me-1"></i>Admin
     </a>
   </div>
@@ -126,7 +130,9 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
         <div class="mt-4 d-flex gap-2">
           <button class="btn btn-primary" type="submit"><i class="fa fa-table me-1"></i>Generuj tabelę</button>
           <button class="btn btn-success" type="button" id="generatePDF" disabled><i class="fa-regular fa-file-pdf me-1"></i>Pobierz PDF</button>
-          <button class="btn btn-outline-primary" type="button" id="sendPDFEmail" disabled><i class="fa-regular fa-paper-plane me-1"></i>Wyślij na maila</button>
+          <button class="btn btn-outline-primary" type="button" id="sendPDFEmail" disabled>
+            <span class="btn-label"><i class="fa-regular fa-paper-plane me-1"></i>Wyślij na maila</span>
+          </button>
         </div>
       </form>
     </div>
@@ -142,14 +148,23 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
   </section>
 </main>
 
+<!-- overlay -->
+<div id="sendingOverlay">
+  <div class="box">
+    <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+    <div>Wysyłanie…</div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 (()=>{"use strict";
-/* Parametry */
-const MIN_START=7, MAX_END=20;
+/* Limity okna pracy */
+const MIN_START=6, MAX_END=20; // twardo 06–20
 const MIN_H=4, MAX_H=16;
+
 const monthNames=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
 let customHolidays=[];
 
@@ -177,7 +192,7 @@ function applyRandomOff(list){
   for(const i of picks){ list[i].isWorkingDay=false; list[i].holidayType="-"; }
 }
 
-/* Rozkład godzin */
+/* Rozkład godzin i przypisanie */
 function weightedHours(min,max,variance){
   const buckets = variance
     ? [{lo:Math.max(min,6),hi:Math.min(max,8),w:5},{lo:Math.max(min,9),hi:Math.min(max,12),w:7},{lo:Math.max(min,13),hi:Math.min(max,16),w:2}]
@@ -233,6 +248,7 @@ function assignTimes(days,hoursArr){
       }
     }
     if(Math.random()<0.3){ s = clampStartForHours(s+(Math.random()<0.5?-1:1),h); e=s+h; }
+
     days[i].hours=h;
     days[i].start=(s<10?`0${s}`:s)+":00";
     days[i].end=(e<10?`0${e}`:e)+":00";
@@ -253,7 +269,7 @@ function assignTimes(days,hoursArr){
   }
 }
 
-/* UI */
+/* UI: zakres dat i lista wolnych */
 function updateRanges(){
   const m=+document.getElementById("month").value||0, y=+document.getElementById("year").value||0;
   const pick=document.getElementById("holidayPicker");
@@ -311,7 +327,7 @@ function generate(){
   let dayData=[];
   for(let d=1; d<=daysInMonth; d++){
     const dt=new Date(y,m-1,d);
-    const iso=toISO(dt);
+    const iso=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const weekend=isWeekend(dt);
     const publicH=hset.has(iso);
     const custom=customHolidays.find(x=>x.date===iso);
@@ -409,6 +425,24 @@ async function makePDFBase64(){
     r.readAsDataURL(blob);
   });
 }
+
+/* UI wysyłki: spinner + blokada */
+function setSending(state){
+  const btn = document.getElementById("sendPDFEmail");
+  const genBtn = document.querySelector('button[type="submit"]');
+  const pdfBtn = document.getElementById("generatePDF");
+  if(state){
+    btn.disabled = true; genBtn.disabled = true; pdfBtn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Wysyłanie…';
+    document.getElementById("sendingOverlay").style.display = "flex";
+  }else{
+    btn.disabled = false; genBtn.disabled = false; pdfBtn.disabled = false;
+    btn.innerHTML = '<span class="btn-label"><i class="fa-regular fa-paper-plane me-1"></i>Wyślij na maila</span>';
+    document.getElementById("sendingOverlay").style.display = "none";
+  }
+}
+
+/* Wysyłka */
 async function downloadPDF(){
   try{
     const base64 = await makePDFBase64();
@@ -418,15 +452,20 @@ async function downloadPDF(){
     document.body.appendChild(link); link.click(); link.remove();
   }catch(e){ console.error(e); alert("Nie udało się wygenerować PDF."); }
 }
+
 async function sendPDFEmail(){
+  const name=document.getElementById("name").value.trim();
+  if(!name){ alert("Podaj imię i nazwisko."); return; }
+  setSending(true);
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 45000); // 45s
   try{
-    const name=document.getElementById("name").value.trim();
-    if(!name){ alert("Podaj imię i nazwisko."); return; }
     const base64 = await makePDFBase64();
     const resp = await fetch("/send-pdf",{
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ name, pdfData: base64 })
+      body: JSON.stringify({ name, pdfData: base64 }),
+      signal: controller.signal
     });
     const text = await resp.text();
     let j; try{ j=JSON.parse(text); } catch { throw new Error("HTTP "+resp.status); }
@@ -435,6 +474,9 @@ async function sendPDFEmail(){
   }catch(e){
     console.error(e);
     alert(e.message || "Błąd wysyłki.");
+  }finally{
+    clearTimeout(timeout);
+    setSending(false);
   }
 }
 })();
