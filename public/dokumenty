@@ -1,1 +1,652 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Oświadczenie do umowy – zlecenia</title>
+  <style>
+    /*
+      CEL: wygląda jak profesjonalny „druk” (papier), ale jest responsywny.
+      - Spójne typografie i odstępy
+      - Podkreślane „linie do wpisania” zamiast ciężkich ramek
+      - Sekcje jak w formularzach urzędowych
+      - Przy druku: białe tło, brak cieni, linie wyraźne
+    */
+
+    :root{
+      --ink:#111827;
+      --muted:#4b5563;
+      --line:#cbd5e1;
+      --line-strong:#94a3b8;
+      --paper:#ffffff;
+      --bg:#f4f6fb;
+      --accent:#0f172a;
+      --focus:#2563eb;
+      --soft:#eef2f7;
+
+      --radius:14px;
+      --pad:20px;
+      --gap:12px;
+
+      --h1:18px;
+      --h2:13px;
+      --base:13.5px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font: var(--base)/1.35 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    .sheet{
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(15,23,42,.06);
+      overflow:hidden;
+    }
+
+    /* Pasek nagłówka jak na druku */
+    .sheetHeader{
+      padding: 16px var(--pad);
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #fbfdff);
+    }
+
+    .title{
+      margin: 0;
+      text-align:center;
+      font-size: var(--h1);
+      letter-spacing: .4px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .subtitle{
+      margin: 6px 0 0;
+      text-align:center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .content{
+      padding: var(--pad);
+    }
+
+    /* Sekcje */
+    .section{
+      border:1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background:#fff;
+      margin-top: 14px;
+    }
+
+    .sectionHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .sectionHeader h2{
+      margin:0;
+      font-size: var(--h2);
+      letter-spacing:.2px;
+      font-weight:800;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .hint{
+      color: var(--muted);
+      font-size: 12px;
+      margin:0;
+      text-align:right;
+      flex: 1;
+    }
+
+    /* Układ pól */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+    }
+    .grid3{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--gap);
+    }
+    @media (max-width: 860px){
+      .grid3{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 0;
+    }
+
+    .label{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Wygląd jak „linia do wpisania” */
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="date"],
+    input[type="number"]{
+      width:100%;
+      padding: 9px 2px;
+      border: none;
+      border-bottom: 1.6px solid var(--line-strong);
+      border-radius: 0;
+      background: transparent;
+      outline: none;
+      color: var(--ink);
+    }
+
+    input::placeholder{ color: #9aa4b2; }
+
+    input:focus{
+      border-bottom-color: var(--focus);
+      box-shadow: 0 2px 0 0 rgba(37,99,235,.18);
+    }
+
+    .toprow{
+      display:flex;
+      gap: 14px;
+      flex-wrap:wrap;
+      justify-content:flex-start;
+      align-items:flex-end;
+    }
+    .toprow .field{ flex: 1 1 240px; }
+    .toprow .field.small{ flex: 0 1 220px; }
+
+    /* Lista oświadczeń */
+    ol{
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+    li{ margin: 10px 0; }
+
+    .lineRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+    .lineRow .text{
+      flex: 1 1 360px;
+      min-width: 260px;
+    }
+
+    /* Chipy radio jak na formularzu */
+    .choices{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .chip{
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff;
+      user-select:none;
+    }
+    .chip input{ margin:0; }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Podpisy */
+    .signGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+      margin-top: 10px;
+    }
+    @media (max-width: 760px){
+      .signGrid{ grid-template-columns: 1fr; }
+    }
+
+    .signBox{
+      border:1px dashed var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+      min-height: 140px;
+    }
+    .signTitle{ font-weight:800; margin: 0 0 8px; }
+
+    /* Pasek przycisków */
+    .btnbar{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      margin-top: 14px;
+    }
+
+    button{
+      border: 1px solid var(--line);
+      background:#fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--ink);
+    }
+
+    button:hover{ border-color:#b6c2d0; }
+
+    .primary{
+      border-color: var(--focus);
+      background: rgba(37,99,235,.08);
+    }
+
+    /* Druk */
+    @media print{
+      body{ background:#fff; }
+      .wrap{ margin:0; max-width:none; padding:0; }
+      .sheet{ border:none; border-radius:0; box-shadow:none; }
+      .sheetHeader{ border-bottom: 1px solid #000; }
+      .section{ border: 1px solid #000; }
+      .btnbar{ display:none; }
+      input{ border-bottom-color: #000 !important; box-shadow:none !important; }
+      .chip{ border-color:#000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sheet">
+      <div class="sheetHeader">
+        <h1 class="title">OŚWIADCZENIE DO UMOWY – ZLECENIA</h1>
+        <p class="subtitle">Wypełnij pola. W miejscach z „kropkami” są linie do wpisania. Dokument gotowy do druku / PDF.</p>
+      </div>
+
+      <div class="content">
+        <!-- DANE PODSTAWOWE -->
+        <div class="section">
+          <div class="sectionHeader">
+            <h2>Dane identyfikacyjne</h2>
+            <p class="hint">Uzupełnij czytelnie (jak w dokumencie).</p>
+          </div>
+
+          <div class="toprow">
+            <div class="field small">
+              <div class="label">Miejscowość</div>
+              <input type="text" name="miejscowosc" placeholder="np. Warszawa" />
+            </div>
+            <div class="field small">
+              <div class="label">Dnia</div>
+              <input type="date" name="data_sporzadzenia" />
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <div class="label">Nazwisko i imię / drugie imię / nazwisko rodowe</div>
+              <input type="text" name="nazwisko_imie_drugie_rodowe" />
+            </div>
+            <div class="field">
+              <div class="label">Imiona rodziców oraz nazwisko rodowe matki</div>
+              <input type="text" name="rodzice_matka_rodowe" />
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <div class="label">Adres zamieszkania – kod, miejscowość, ulica, nr domu, gmina</div>
+            <input type="text" name="adres_zamieszkania" placeholder="np. 01-460 Warszawa, ul. ..., nr ..., gmina ..." />
+          </div>
+
+          <div class="grid" style="margin-top:10px;">
+            <div class="field">
+              <div class="label">NIP</div>
+              <input type="text" name="nip" inputmode="numeric" placeholder="np. 1234567890" />
+            </div>
+            <div class="field">
+              <div class="label">Województwo</div>
+              <input type="text" name="wojewodztwo" placeholder="np. mazowieckie" />
+            </div>
+          </div>
+
+          <div class="grid" style="margin-top:10px;">
+            <div class="field">
+              <div class="label">Adres e-mail</div>
+              <input type="email" name="email" placeholder="np. jan.kowalski@firma.pl" />
+            </div>
+            <div class="field">
+              <div class="label">Numer telefonu</div>
+              <input type="tel" name="telefon" inputmode="tel" placeholder="np. 500 600 700" />
+            </div>
+          </div>
+
+          <div class="grid" style="margin-top:10px;">
+            <div class="field">
+              <div class="label">PESEL</div>
+              <input type="text" name="pesel" inputmode="numeric" placeholder="11 cyfr" />
+            </div>
+            <div class="field">
+              <div class="label">Data i miejsce urodzenia</div>
+              <input type="text" name="data_miejsce_urodzenia" placeholder="np. 2000-01-01, Warszawa" />
+            </div>
+          </div>
+
+          <div class="grid" style="margin-top:10px;">
+            <div class="field">
+              <div class="label">Nazwa i adres Urzędu Skarbowego</div>
+              <input type="text" name="urzad_skarbowy" />
+            </div>
+            <div class="field">
+              <div class="label">Fundusz Zdrowia</div>
+              <input type="text" name="fundusz_zdrowia" />
+            </div>
+          </div>
+        </div>
+
+        <!-- OŚWIADCZENIA -->
+        <div class="section">
+          <div class="sectionHeader">
+            <h2>Oświadczenia</h2>
+            <p class="hint">* niepotrzebne skreślić • ** potwierdza zakład pracy</p>
+          </div>
+
+          <ol>
+            <li>
+              <div class="lineRow">
+                <div class="text">Jestem zatrudniony(a) na podstawie umowy o pracę (nazwa zakładu pracy)</div>
+                <div style="flex:1 1 320px; min-width:260px;">
+                  <input type="text" name="zaklad_pracy_1" />
+                </div>
+              </div>
+
+              <div class="grid" style="margin-top:10px;">
+                <div class="field">
+                  <div class="label">W wymiarze</div>
+                  <input type="text" name="wymiar_etatu" placeholder="np. 1/1, 1/2, 3/4" />
+                </div>
+                <div class="field">
+                  <div class="label">Rodzaj umowy</div>
+                  <div class="choices">
+                    <label class="chip"><input type="radio" name="czas_umowy" value="nieokreslony"> na czas nieokreślony</label>
+                    <label class="chip"><input type="radio" name="czas_umowy" value="okreslony"> na czas określony</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid" style="margin-top:10px;">
+                <div class="field">
+                  <div class="label">Na czas określony od</div>
+                  <input type="date" name="czas_okreslony_od" />
+                </div>
+                <div class="field">
+                  <div class="label">Do</div>
+                  <input type="date" name="czas_okreslony_do" />
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="lineRow">
+                <div class="text">Prowadzę / nie prowadzę* działalność gospodarczą.</div>
+                <div class="choices">
+                  <label class="chip"><input type="radio" name="dzialalnosc" value="prowadze"> prowadzę</label>
+                  <label class="chip"><input type="radio" name="dzialalnosc" value="nie_prowadze"> nie prowadzę*</label>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="grid" style="margin-top:2px;">
+                <div class="field">
+                  <div class="label">Jestem emerytem / rencistą*</div>
+                  <div class="choices">
+                    <label class="chip"><input type="radio" name="emeryt_rencista" value="emeryt"> emeryt</label>
+                    <label class="chip"><input type="radio" name="emeryt_rencista" value="rencista"> rencista*</label>
+                    <label class="chip"><input type="radio" name="emeryt_rencista" value="nie_dotyczy"> nie dotyczy</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="label">Nr emerytury / renty</div>
+                  <input type="text" name="nr_emerytury_renty" />
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="grid" style="margin-top:2px;">
+                <div class="field">
+                  <div class="label">Jestem / nie jestem* studentem/uczniem</div>
+                  <div class="choices">
+                    <label class="chip"><input type="radio" name="student_uczen" value="jestem"> jestem</label>
+                    <label class="chip"><input type="radio" name="student_uczen" value="nie_jestem"> nie jestem*</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="label">Data urodzenia</div>
+                  <input type="date" name="data_urodzenia" />
+                </div>
+              </div>
+              <div class="field" style="margin-top:10px;">
+                <div class="label">Nazwa uczelni/szkoły</div>
+                <input type="text" name="uczelnia_szkola" />
+              </div>
+            </li>
+
+            <li>
+              <div class="lineRow">
+                <div class="text">Utraciłem(am) status studenta/ucznia w dniu</div>
+                <div style="flex:0 1 240px; min-width:220px;">
+                  <input type="date" name="data_utrata_statusu" />
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="lineRow">
+                <div class="text">Jestem / nie jestem* doktorantem</div>
+                <div class="choices">
+                  <label class="chip"><input type="radio" name="doktorant" value="jestem"> jestem</label>
+                  <label class="chip"><input type="radio" name="doktorant" value="nie_jestem"> nie jestem*</label>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="grid">
+                <div class="field">
+                  <div class="label">Jestem / nie jestem* bezrobotny(a), zarejestrowany(a) w Urzędzie Pracy</div>
+                  <div class="choices">
+                    <label class="chip"><input type="radio" name="bezrobotny" value="jestem"> jestem</label>
+                    <label class="chip"><input type="radio" name="bezrobotny" value="nie_jestem"> nie jestem*</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="label">Urząd Pracy w</div>
+                  <input type="text" name="urzad_pracy_miasto" />
+                </div>
+              </div>
+              <div class="grid" style="margin-top:10px;">
+                <div class="field">
+                  <div class="label">Pod numerem</div>
+                  <input type="text" name="urzad_pracy_numer" />
+                </div>
+                <div class="field">
+                  <div class="label">Pobieram / nie pobieram* zasiłek dla bezrobotnych</div>
+                  <div class="choices">
+                    <label class="chip"><input type="radio" name="zasilek" value="pobieram"> pobieram</label>
+                    <label class="chip"><input type="radio" name="zasilek" value="nie_pobieram"> nie pobieram*</label>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="grid">
+                <div class="field">
+                  <div class="label">Przebywam na urlopie wychowawczym od</div>
+                  <input type="date" name="urlop_wychowawczy_od" />
+                </div>
+                <div class="field">
+                  <div class="label">Do</div>
+                  <input type="date" name="urlop_wychowawczy_do" />
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="grid">
+                <div class="field">
+                  <div class="label">Przebywam na urlopie macierzyńskim od</div>
+                  <input type="date" name="urlop_macierzynski_od" />
+                </div>
+                <div class="field">
+                  <div class="label">Do</div>
+                  <input type="date" name="urlop_macierzynski_do" />
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="lineRow">
+                <div class="text">Wnoszę / nie wnoszę* o objęcie mnie dobrowolnym / obowiązkowym ubezpieczeniem społecznym.</div>
+                <div class="choices">
+                  <label class="chip"><input type="radio" name="ubezp_spoleczne_wniosek" value="wnosze"> wnoszę</label>
+                  <label class="chip"><input type="radio" name="ubezp_spoleczne_wniosek" value="nie_wnosze"> nie wnoszę*</label>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="lineRow">
+                <div class="text">Wnoszę / nie wnoszę* o objęcie mnie dobrowolnym ubezpieczeniem chorobowym.</div>
+                <div class="choices">
+                  <label class="chip"><input type="radio" name="ubezp_chorobowe" value="wnosze"> wnoszę</label>
+                  <label class="chip"><input type="radio" name="ubezp_chorobowe" value="nie_wnosze"> nie wnoszę*</label>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="lineRow">
+                <div class="text">Wynagrodzenie z tytułu stosunku pracy wynosi</div>
+                <div class="choices">
+                  <label class="chip"><input type="radio" name="wynagrodzenie_min" value="co_najmniej"> co najmniej najniższe wynagrodzenie</label>
+                  <label class="chip"><input type="radio" name="wynagrodzenie_min" value="nizsze"> jest niższe od najniższego wynagrodzenia**</label>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="grid">
+                <div class="field">
+                  <div class="label">Jestem / nie jestem* objęty(a) obowiązkowym ubezpieczeniem społecznym z tytułu umowy zlecenia</div>
+                  <div class="choices">
+                    <label class="chip"><input type="radio" name="ubezp_zlecenie" value="jestem"> jestem</label>
+                    <label class="chip"><input type="radio" name="ubezp_zlecenie" value="nie_jestem"> nie jestem*</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="label">Umowa zlecenia nr</div>
+                  <input type="text" name="umowa_zlecenia_nr" />
+                </div>
+              </div>
+
+              <div class="grid" style="margin-top:10px;">
+                <div class="field">
+                  <div class="label">Zawarta na okres od</div>
+                  <input type="date" name="umowa_okres_od" />
+                </div>
+                <div class="field">
+                  <div class="label">Do</div>
+                  <input type="date" name="umowa_okres_do" />
+                </div>
+              </div>
+
+              <div class="field" style="margin-top:10px;">
+                <div class="label">W zakładzie pracy (nazwa zakładu pracy)</div>
+                <input type="text" name="zaklad_pracy_13" />
+              </div>
+            </li>
+          </ol>
+
+          <p class="note">W przypadku zmiany okoliczności, o których mowa w wyżej wymienionych punktach zobowiązuję się do niezwłocznego zawiadomienia o powyższym.</p>
+        </div>
+
+        <!-- POTWIERDZENIA / PODPISY -->
+        <div class="section">
+          <div class="sectionHeader">
+            <h2>Potwierdzenia i podpisy</h2>
+            <p class="hint">Wydrukuj lub zapisz do PDF po uzupełnieniu.</p>
+          </div>
+
+          <p style="margin:0 0 10px; font-weight:800;">I. Potwierdzenie zakładu pracy zatrudniającego zleceniobiorcę na podstawie umowy o pracę</p>
+
+          <div class="signGrid">
+            <div class="signBox">
+              <p class="signTitle">Zakład pracy</p>
+              <div class="field">
+                <div class="label">Data</div>
+                <input type="date" name="potwierdzenie_data" />
+              </div>
+              <div class="field" style="margin-top:10px;">
+                <div class="label">Podpis osoby upoważnionej + pieczątka imienna / pieczątka zakładu pracy</div>
+                <input type="text" name="podpis_upowazniony" placeholder="(miejsce na podpis/pieczątkę – w wersji papierowej)" />
+              </div>
+            </div>
+
+            <div class="signBox">
+              <p class="signTitle">Zleceniobiorca</p>
+              <div class="field">
+                <div class="label">Data</div>
+                <input type="date" name="zleceniobiorca_data" />
+              </div>
+              <div class="field" style="margin-top:10px;">
+                <div class="label">Podpis zleceniobiorcy</div>
+                <input type="text" name="podpis_zleceniobiorcy" placeholder="(miejsce na podpis – w wersji papierowej)" />
+              </div>
+            </div>
+          </div>
+
+          <div class="note">* niepotrzebne skreślić &nbsp;&nbsp; ** potwierdza zakład pracy</div>
+
+          <div class="btnbar">
+            <button type="button" class="primary" onclick="window.print()">Drukuj / Zapisz do PDF</button>
+            <button type="reset" onclick="document.querySelector('form')?.reset?.()">Wyczyść</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
 
