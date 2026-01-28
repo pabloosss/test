@@ -66,6 +66,43 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
   border-bottom-color:rgba(108,117,125,.25);
 }
 @media print{ .footer-tools{ display:none; } }
+
+/* ===== DYSKRETNY LINK "NADGODZINY" NA GÓRZE ===== */
+.top-tools{
+  margin-top:8px;
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  align-items:center;
+  opacity:.68;
+  transition:opacity .2s ease;
+  user-select:none;
+}
+.top-tools:hover{ opacity:1; }
+.top-tools a{
+  font-size:12px;
+  color:#6c757d;
+  text-decoration:none;
+  border-bottom:1px dashed rgba(108,117,125,.55);
+  padding-bottom:1px;
+}
+.top-tools a:hover{
+  color:#495057;
+  border-bottom-color:rgba(73,80,87,.8);
+}
+#overtimePanel{
+  display:none;
+  margin-top:10px;
+  padding:12px;
+  border:1px dashed #cbd5e1;
+  border-radius:10px;
+  background:#fff;
+}
+#overtimePanel .hint{
+  font-size:12px;
+  color:#64748b;
+  margin:0 0 10px 0;
+}
 </style>
 </head>
 <body>
@@ -155,6 +192,32 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
           </div>
         </div>
 
+        <!-- DYSKRETNY LINK NA GÓRZE + PANEL -->
+        <div class="top-tools">
+          <a href="#" id="toggleOvertime"><i class="fa-regular fa-clock me-1"></i>Nadgodziny</a>
+        </div>
+
+        <div id="overtimePanel">
+          <p class="hint">Dodaj nadgodziny: wybierz dzień i liczbę godzin. Nadgodziny doliczają się w tabeli jako „8+2” i w sumie jako „160+12 (nadgodziny)”.</p>
+          <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label small mb-1" for="overtimePicker">Dzień *</label>
+              <input class="form-control" type="date" id="overtimePicker">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small mb-1" for="overtimeHours">Nadgodziny (h) *</label>
+              <input class="form-control" type="number" id="overtimeHours" min="1" step="1" value="2">
+            </div>
+            <div class="col-md-2 d-grid">
+              <button class="btn btn-outline-secondary" type="button" id="addOvertime"><i class="fa fa-plus"></i></button>
+            </div>
+            <div class="col-md-2 d-grid">
+              <button class="btn btn-outline-danger" type="button" id="clearOvertime"><i class="fa fa-trash"></i></button>
+            </div>
+          </div>
+          <ul class="small mt-2" id="overtimeList"></ul>
+        </div>
+
         <div class="mt-4 d-flex gap-2">
           <button class="btn btn-primary" type="submit"><i class="fa fa-table me-1"></i>Generuj tabelę</button>
           <button class="btn btn-success" type="button" id="generatePDF" disabled><i class="fa-regular fa-file-pdf me-1"></i>Pobierz PDF</button>
@@ -200,12 +263,14 @@ const MIN_H=4, MAX_H=16;
 const MAX_H_Z = Math.min(MAX_H, MAX_END - MIN_START); // 14
 const monthNames=["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
 let customHolidays=[];
+let overtimeEntries=[]; // {date:"YYYY-MM-DD", hours:number}
 
 /* Utils */
 const ri=(a,b)=>{a=Math.ceil(a);b=Math.floor(b);return Math.floor(Math.random()*(b-a+1))+a;}
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const toISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const isWeekend=d=>{const w=d.getDay();return w===0||w===6;}
+const fmtNum=n=>Number.isInteger(n)?String(n):String(n); // (tu trzymamy integer)
 function easterSunday(year){const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;return new Date(year,mo-1,day);}
 
 /* JEDYNA ZMIANA: dodane 12-24 jako święto */
@@ -318,10 +383,18 @@ function assignTimes(days,hoursArr){
 function updateRanges(){
   const m=+document.getElementById("month").value||0, y=+document.getElementById("year").value||0;
   const pick=document.getElementById("holidayPicker");
-  if(!m||!y){ pick.removeAttribute("min"); pick.removeAttribute("max"); return; }
+  const opick=document.getElementById("overtimePicker");
+  if(!m||!y){
+    pick.removeAttribute("min"); pick.removeAttribute("max");
+    opick.removeAttribute("min"); opick.removeAttribute("max");
+    return;
+  }
   const days=new Date(y,m,0).getDate(), mm=String(m).padStart(2,'0');
-  pick.min=`${y}-${mm}-01`; pick.max=`${y}-${mm}-${String(days).padStart(2,'0')}`;
+  const min=`${y}-${mm}-01`, max=`${y}-${mm}-${String(days).padStart(2,'0')}`;
+  pick.min=min; pick.max=max;
+  opick.min=min; opick.max=max;
 }
+
 function renderHolidays(){
   const ul=document.getElementById("holidaysList"); ul.innerHTML="";
   customHolidays.sort((a,b)=>a.date.localeCompare(b.date));
@@ -331,6 +404,19 @@ function renderHolidays(){
     const btn=document.createElement("button");
     btn.className="btn btn-sm btn-outline-danger ms-2"; btn.textContent="Usuń";
     btn.onclick=()=>{ customHolidays=customHolidays.filter(x=>x!==item); renderHolidays(); };
+    li.appendChild(btn); ul.appendChild(li);
+  }
+}
+
+function renderOvertime(){
+  const ul=document.getElementById("overtimeList"); ul.innerHTML="";
+  overtimeEntries.sort((a,b)=>a.date.localeCompare(b.date));
+  for(const item of overtimeEntries){
+    const li=document.createElement("li");
+    li.textContent = `${item.date} – +${item.hours}h`;
+    const btn=document.createElement("button");
+    btn.className="btn btn-sm btn-outline-danger ms-2"; btn.textContent="Usuń";
+    btn.onclick=()=>{ overtimeEntries=overtimeEntries.filter(x=>x!==item); renderOvertime(); };
     li.appendChild(btn); ul.appendChild(li);
   }
 }
@@ -350,6 +436,32 @@ document.addEventListener("DOMContentLoaded", ()=>{
     else{ alert("Ta data już jest dodana."); }
     renderHolidays();
   });
+
+  document.getElementById("toggleOvertime").addEventListener("click", (e)=>{
+    e.preventDefault();
+    const p=document.getElementById("overtimePanel");
+    p.style.display = (p.style.display==="none" || !p.style.display) ? "block" : "none";
+  });
+
+  document.getElementById("addOvertime").addEventListener("click", ()=>{
+    const d=document.getElementById("overtimePicker").value;
+    const h=+document.getElementById("overtimeHours").value||0;
+    if(!d){ alert("Wybierz datę nadgodzin."); return; }
+    if(!Number.isFinite(h) || h<=0){ alert("Podaj dodatnią liczbę godzin."); return; }
+
+    // Nadpisz jeśli już jest
+    const ex=overtimeEntries.find(x=>x.date===d);
+    if(ex) ex.hours = Math.round(h);
+    else overtimeEntries.push({date:d,hours:Math.round(h)});
+
+    renderOvertime();
+  });
+
+  document.getElementById("clearOvertime").addEventListener("click", ()=>{
+    overtimeEntries=[];
+    renderOvertime();
+  });
+
   document.getElementById("month").addEventListener("change", updateRanges);
   document.getElementById("year").addEventListener("change", updateRanges);
 
@@ -381,6 +493,14 @@ function generate(){
   const daysInMonth=new Date(y,m,0).getDate();
   const hset=plHolidays(y);
 
+  // Overtime map tylko dla tego miesiąca
+  const mm=String(m).padStart(2,'0');
+  const prefix=`${y}-${mm}-`;
+  const overtimeMap=new Map();
+  for(const it of overtimeEntries){
+    if(it.date && it.date.startsWith(prefix)) overtimeMap.set(it.date, it.hours);
+  }
+
   let dayData=[];
   for(let d=1; d<=daysInMonth; d++){
     const dt=new Date(y,m-1,d);
@@ -390,7 +510,7 @@ function generate(){
     const custom=customHolidays.find(x=>x.date===iso);
     const isWork = (!weekend && !publicH && !custom);
     const hol = publicH ? "Święto" : (custom ? custom.type : "");
-    dayData.push({day:d,date:dt,isWorkingDay:isWork,holidayType:hol,hours:0,start:"-",end:"-"});
+    dayData.push({day:d,iso,date:dt,isWorkingDay:isWork,holidayType:hol,hours:0,start:"-",end:"-"});
   }
 
   if(type==="zlecenie" && rand){ applyRandomOff(dayData); }
@@ -412,6 +532,16 @@ function generate(){
     assignTimes(working, arr);
   }
 
+  // Walidacja: nadgodziny tylko na dni robocze (żeby nie robić „0+2” na wolnym)
+  for(const [iso,oh] of overtimeMap.entries()){
+    const d=dayData.find(x=>x.iso===iso);
+    if(!d || !d.isWorkingDay){
+      alert(`Nadgodziny ${iso} są na dniu wolnym/święcie. Usuń je albo wybierz dzień roboczy.`);
+      return;
+    }
+    if(oh<=0) overtimeMap.delete(iso);
+  }
+
   document.getElementById("mname").textContent = `${monthNames[m-1]} ${y}`;
   document.getElementById("pname").textContent = name;
   document.getElementById("ctype").textContent =
@@ -419,21 +549,32 @@ function generate(){
 
   const last = name.split(/\s+/).slice(1).join(" ") || name;
 
+  let baseSum=0;
+  let overtimeSum=0;
+
   const rows = dayData.map(inf=>{
     const dd=String(inf.day).padStart(2,'0'), mm=String(m).padStart(2,'0'), yyyy=y;
     const wkd=inf.date.toLocaleString('pl-PL',{weekday:'short'});
+    const ot = overtimeMap.get(inf.iso) || 0;
+
     if(inf.isWorkingDay){
+      baseSum += inf.hours;
+      overtimeSum += ot;
+
+      const hoursCell = ot>0 ? `${fmtNum(inf.hours)}+${fmtNum(ot)}` : `${fmtNum(inf.hours)}`;
+
       return `<tr>
         <td class="mono">${inf.day}</td>
         <td class="col-date">${dd}.${mm}.${yyyy} (${wkd})</td>
         <td class="mono">${inf.start}</td>
         <td class="mono">${inf.end}</td>
-        <td class="mono">${inf.hours}</td>
+        <td class="mono">${hoursCell}</td>
         <td>${last}</td>
         <td></td>
         <td>-</td>
       </tr>`;
     }
+
     const shown = inf.holidayType ? inf.holidayType : "-";
     return `<tr class="off">
       <td class="mono">${inf.day}</td>
@@ -447,7 +588,10 @@ function generate(){
     </tr>`;
   });
 
-  const sum=dayData.filter(d=>d.isWorkingDay).reduce((a,b)=>a+b.hours,0);
+  const sumCell = overtimeSum>0
+    ? `<span class="mono">${baseSum}+${overtimeSum}</span> <span style="font-size:12px;color:#555">(nadgodziny)</span>`
+    : `<span class="mono">${baseSum}</span>`;
+
   const table=`
   <table class="table-times">
     <thead>
@@ -463,7 +607,7 @@ function generate(){
       </tr>
     </thead>
     <tbody>${rows.join("")}</tbody>
-    <tfoot><tr><td colspan="4">Suma</td><td class="mono">${sum}</td><td colspan="3"></td></tr></tfoot>
+    <tfoot><tr><td colspan="4">Suma</td><td>${sumCell}</td><td colspan="3"></td></tr></tfoot>
   </table>`;
   document.getElementById("output").innerHTML=table;
   document.getElementById("resultWrap").style.display='block';
@@ -499,7 +643,7 @@ ${wrap.innerHTML}
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `Tabela_Godzinowa_${title}.doc`;
+  a.download = \`Tabela_Godzinowa_\${title}.doc\`;
   document.body.appendChild(a);
   a.click();
   a.remove();
