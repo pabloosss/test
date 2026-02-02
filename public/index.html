@@ -197,7 +197,10 @@ header{background:#fff;border-bottom:1px solid #e5e7eb}
         </div>
 
         <div id="overtimePanel">
-          <p class="hint">Wybierz dzień i liczbę nadgodzin. Dzień z nadgodzinami nie może zostać wylosowany jako wolny. Weekend/święto/ręczne wolne – blokowane.</p>
+          <p class="hint">
+            Nadgodziny możesz dodać także w weekend/święto/wolne – wtedy w tabeli będzie „0+X”.
+            W zwykły dzień roboczy – dzień jest “rezerwowany”, żeby losowe wolne go nie skasowało.
+          </p>
           <div class="row g-2 align-items-end">
             <div class="col-md-5">
               <label class="form-label small mb-1" for="overtimePicker">Dzień *</label>
@@ -448,7 +451,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const ex=overtimeEntries.find(x=>x.date===d);
     if(ex) ex.hours = Math.round(h);
     else overtimeEntries.push({date:d,hours:Math.round(h)});
-
     renderOvertime();
   });
 
@@ -492,7 +494,7 @@ function generate(){
   const prefix=`${y}-${mm}-`;
   const overtimeMap=new Map();
   for(const it of overtimeEntries){
-    if(it.date && it.date.startsWith(prefix)) overtimeMap.set(it.date, it.hours);
+    if(it.date && it.date.startsWith(prefix) && it.hours>0) overtimeMap.set(it.date, it.hours);
   }
 
   let dayData=[];
@@ -510,10 +512,9 @@ function generate(){
   // losowe wolne
   if(type==="zlecenie" && rand){ applyRandomOff(dayData); }
 
-  // KLUCZ: dzień z nadgodzinami NIE MOŻE zostać wylosowany jako wolny
-  // ale nadal blokujemy weekend/święto/ręczne wolne
+  // REZERWACJA dnia TYLKO dla normalnego dnia roboczego (żeby losowe wolne go nie skasowało)
+  // Weekend/święto/ręczne wolne: NIE robimy z tego dnia roboczego, ale nadgodziny są OK -> będzie 0+X
   for(const [iso,oh] of overtimeMap.entries()){
-    if(!oh || oh<=0) continue;
     const row = dayData.find(x=>x.iso===iso);
     if(!row) continue;
 
@@ -521,12 +522,10 @@ function generate(){
     const publicH=hset.has(iso);
     const custom=customHolidays.find(x=>x.date===iso);
 
-    if(weekend || publicH || custom){
-      alert(`Nadgodziny ${iso} są na dniu wolnym/święcie/ręcznie oznaczonym. Wybierz dzień roboczy.`);
-      return;
+    if(!weekend && !publicH && !custom){
+      row.isWorkingDay = true;
+      row.holidayType = "";
     }
-    row.isWorkingDay = true;   // “rezerwacja” dnia
-    row.holidayType = "";      // żeby nie świecił jako "-"
   }
 
   let working=dayData.filter(x=>x.isWorkingDay);
@@ -561,34 +560,32 @@ function generate(){
     const wkd=inf.date.toLocaleString('pl-PL',{weekday:'short'});
     const ot = overtimeMap.get(inf.iso) || 0;
 
-    if(inf.isWorkingDay){
-      baseSum += inf.hours;
-      overtimeSum += ot;
+    // sumy: bazowe tylko z roboczych, nadgodziny z KAŻDEGO dnia
+    if(inf.isWorkingDay) baseSum += inf.hours;
+    overtimeSum += ot;
 
-      const hoursCell = ot>0 ? `${inf.hours}+${ot}` : `${inf.hours}`;
+    const hoursCell = ot>0 ? `${inf.hours||0}+${ot}` : `${inf.isWorkingDay?inf.hours:0}`;
 
-      return `<tr>
-        <td class="mono">${inf.day}</td>
-        <td class="col-date">${dd}.${mmm}.${yyyy} (${wkd})</td>
-        <td class="mono">${inf.start}</td>
-        <td class="mono">${inf.end}</td>
-        <td class="mono">${hoursCell}</td>
-        <td>${last}</td>
-        <td></td>
-        <td>-</td>
-      </tr>`;
-    }
+    // opis “Urlop” dla wolnych:
+    const weekend=isWeekend(inf.date);
+    const shownLeave = inf.holidayType ? inf.holidayType : (inf.isWorkingDay ? "-" : (weekend ? "Weekend" : "-"));
 
-    const shown = inf.holidayType ? inf.holidayType : "-";
-    return `<tr class="off">
+    // styl czerwony tylko gdy wolne i brak nadgodzin
+    const trClass = (!inf.isWorkingDay && ot===0) ? ' class="off"' : "";
+
+    // start/end: tylko gdy jest bazowa praca (roboczy); weekend z nadgodzinami ma zostać z '-' (czytelnie)
+    const startCell = inf.isWorkingDay ? inf.start : "-";
+    const endCell   = inf.isWorkingDay ? inf.end   : "-";
+
+    return `<tr${trClass}>
       <td class="mono">${inf.day}</td>
       <td class="col-date">${dd}.${mmm}.${yyyy} (${wkd})</td>
-      <td class="mono">-</td>
-      <td class="mono">-</td>
-      <td class="mono">0</td>
+      <td class="mono">${startCell}</td>
+      <td class="mono">${endCell}</td>
+      <td class="mono">${hoursCell}</td>
       <td>${last}</td>
       <td></td>
-      <td>${shown}</td>
+      <td>${shownLeave}</td>
     </tr>`;
   });
 
@@ -620,7 +617,7 @@ function generate(){
   document.getElementById("downloadWordLink").setAttribute("aria-disabled","false");
 }
 
-/* WORD (stary, prosty .doc z HTML — zostawiam jak było) */
+/* WORD (zostawiam jak było) */
 function downloadWord(){
   const wrap = document.getElementById("resultWrap");
   if(wrap.style.display === "none"){ alert("Najpierw wygeneruj tabelę."); return; }
