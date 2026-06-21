@@ -1,24 +1,32 @@
 # Strona Zarobek
 
-Strona reklamowa dla osoby tworzącej strony internetowe na zamówienie.
+Profesjonalna strona reklamowa dla osoby tworzącej strony internetowe na zamówienie.
 
 ## Branch roboczy
 
-Pracujemy na branchu:
+Pracujemy wyłącznie na branchu:
 
 ```text
 moja-strona
 ```
 
-## Co zawiera strona
+## Cel strony
 
-- oferta tworzenia stron internetowych
+Strona ma reklamować usługę tworzenia stron internetowych dla małych firm. Ma wyglądać profesjonalnie, jasno tłumaczyć ofertę i prowadzić klienta do kontaktu.
+
+## Obecna wersja
+
+Wersja V2 zawiera:
+
+- profesjonalny hero section
+- ofertę usług
 - pakiety cenowe
-- sekcja przykładowych stron demo
 - proces współpracy
+- sekcję jakości
+- przykładowe kierunki demo bez martwych linków
 - FAQ
-- telefon i e-mail kontaktowy
-- rozbudowany formularz zapytania o stronę
+- telefon i e-mail
+- formularz zapytania o stronę
 
 ## Formularz kontaktowy pyta o
 
@@ -30,9 +38,9 @@ moja-strona
 - budżet
 - termin
 - oczekiwane elementy strony
-- opis potrzeb klienta
+- opis projektu
 
-## Do uzupełnienia przed publikacją
+## Ważne dane do podmiany
 
 W plikach `index.html` i `script.js` trzeba zmienić dane tymczasowe:
 
@@ -43,11 +51,8 @@ kontakt@example.pl
 
 na prawdziwy telefon i prawdziwy adres e-mail.
 
-## Plan folderów demo
+## Formularz
 
-```text
-demo/kebab/
-demo/mechanik/
-demo/beauty/
-demo/transport/
-```
+Aktualnie formularz działa przez `mailto:`. To oznacza, że po kliknięciu przygotowuje gotową wiadomość e-mail w programie pocztowym użytkownika.
+
+Później można podpiąć prawdziwą obsługę formularza przez backend albo zewnętrzną usługę formularzy.
