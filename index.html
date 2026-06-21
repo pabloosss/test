@@ -4,31 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Strony internetowe na zamówienie | Paweł</title>
-  <meta name="description" content="Tworzę proste i nowoczesne strony internetowe dla małych firm. Strony wizytówki, landing page, strony firmowe i przykładowe demo dla branż." />
+  <meta name="description" content="Profesjonalne strony internetowe dla małych firm: strona wizytówka, landing page, strona firmowa, kontakt, formularz zapytania i pomoc z publikacją." />
+  <meta name="theme-color" content="#0B1020" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="top-bar">
-    <span>Strony dla małych firm</span>
-    <strong>od 499 zł</strong>
-    <span>szybka wycena · prosty kontakt · pomoc z publikacją</span>
+  <a class="skip-link" href="#kontakt">Przejdź do kontaktu</a>
+
+  <div class="top-line">
+    <div class="container top-line-inner">
+      <span>Strony internetowe dla małych firm</span>
+      <strong>Wstępna wycena bez zobowiązań</strong>
+      <span>Warszawa / online</span>
+    </div>
   </div>
 
   <header class="site-header">
     <nav class="nav container" aria-label="Główna nawigacja">
       <a class="brand" href="#start" aria-label="Strona główna">
         <span class="brand-mark">P</span>
-        <span class="brand-text">Paweł<span>Strony</span></span>
+        <span class="brand-name">Paweł <strong>Web Design</strong></span>
       </a>
-      <button class="nav-toggle" id="navToggle" aria-label="Otwórz menu">☰</button>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Otwórz menu" aria-expanded="false">Menu</button>
+
       <div class="nav-links" id="navLinks">
         <a href="#oferta">Oferta</a>
         <a href="#pakiety">Pakiety</a>
-        <a href="#demo">Demo</a>
-        <a href="#proces">Proces</a>
+        <a href="#jak-dzialam">Jak działam</a>
+        <a href="#przyklady">Przykłady</a>
         <a href="#kontakt" class="nav-cta">Kontakt</a>
       </div>
     </nav>
@@ -38,253 +45,264 @@
     <section class="hero" id="start">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">Strony internetowe na zamówienie</p>
-          <h1>Robię proste strony internetowe dla małych firm.</h1>
-          <p class="hero-text">
-            Szybko, konkretnie i bez przepłacania. Strona wizytówka, landing page, portfolio albo strona firmowa z ofertą, mapą, kontaktem i formularzem zapytania.
+          <p class="eyebrow">Projektowanie i wdrażanie stron internetowych</p>
+          <h1>Strona internetowa, która wygląda profesjonalnie i pomaga zdobywać zapytania.</h1>
+          <p class="hero-lead">
+            Tworzę nowoczesne strony dla małych firm, usług lokalnych i freelancerów. Bez zbędnego komplikowania: jasna oferta, dobry wygląd, wersja mobilna, szybki kontakt i pomoc z publikacją.
           </p>
 
           <div class="hero-actions">
             <a href="#kontakt" class="btn btn-primary">Zapytaj o wycenę</a>
-            <a href="#demo" class="btn btn-secondary">Zobacz przykłady</a>
+            <a href="#pakiety" class="btn btn-secondary">Zobacz zakres usług</a>
           </div>
 
-          <div class="contact-pills" aria-label="Szybki kontakt">
-            <a href="tel:+48000000000">📞 +48 000 000 000</a>
-            <a href="mailto:kontakt@example.pl">✉️ kontakt@example.pl</a>
-          </div>
-
-          <div class="hero-stats">
-            <div><strong>od 499 zł</strong><span>prosty start</span></div>
-            <div><strong>kilka dni</strong><span>przy gotowych materiałach</span></div>
-            <div><strong>mobile</strong><span>dobrze wygląda na telefonie</span></div>
+          <div class="direct-contact" aria-label="Szybki kontakt">
+            <a href="tel:+48000000000">+48 000 000 000</a>
+            <a href="mailto:kontakt@example.pl">kontakt@example.pl</a>
           </div>
         </div>
 
-        <div class="hero-panel" aria-label="Podgląd przykładowej strony">
-          <div class="browser-dots"><span></span><span></span><span></span></div>
-          <div class="site-preview">
-            <div class="preview-top">
-              <span>Twoja firma</span>
-              <button>Kontakt</button>
-            </div>
-            <h2>Nowoczesna strona dla lokalnego biznesu</h2>
-            <p>Oferta, zdjęcia, opinie, mapa, telefon i formularz zapytania w jednym miejscu.</p>
-            <div class="preview-grid">
-              <div></div><div></div><div></div>
-            </div>
-            <div class="preview-form">
-              <span>Imię i telefon</span>
-              <span>Czego potrzebujesz?</span>
-              <button>Wyślij zapytanie</button>
+        <aside class="hero-card" aria-label="Najważniejsze elementy profesjonalnej strony">
+          <div class="card-header">
+            <span class="status-dot"></span>
+            <span>Projekt strony firmowej</span>
+          </div>
+          <div class="mock-window">
+            <div class="mock-nav"></div>
+            <div class="mock-hero"></div>
+            <div class="mock-grid">
+              <span></span><span></span><span></span>
             </div>
           </div>
-        </div>
+          <ul class="quality-list">
+            <li>czytelna oferta i mocne CTA</li>
+            <li>telefon, e-mail i formularz kontaktowy</li>
+            <li>układ dopasowany do telefonu</li>
+            <li>podstawowe SEO i szybkie ładowanie</li>
+          </ul>
+        </aside>
+      </div>
+
+      <div class="container trust-strip" aria-label="Najważniejsze atuty">
+        <div><strong>01</strong><span>Profesjonalny wygląd</span></div>
+        <div><strong>02</strong><span>Jasna oferta firmy</span></div>
+        <div><strong>03</strong><span>Kontakt bez szukania</span></div>
+        <div><strong>04</strong><span>Pomoc z domeną i publikacją</span></div>
       </div>
     </section>
 
-    <section class="section target-section">
+    <section class="section section-white" id="oferta">
       <div class="container">
-        <div class="section-heading center">
-          <p class="eyebrow">Dla kogo</p>
-          <h2>Dla firm, które chcą wyglądać dobrze w internecie i łatwo zbierać zapytania.</h2>
-        </div>
-        <div class="target-tags">
-          <span>kebab</span>
-          <span>barber</span>
-          <span>mechanik</span>
-          <span>kosmetyczka</span>
-          <span>restauracja</span>
-          <span>transport</span>
-          <span>fachowiec</span>
-          <span>sklep lokalny</span>
-          <span>usługi</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="oferta">
-      <div class="container">
-        <div class="section-heading split">
+        <div class="section-head split">
           <div>
             <p class="eyebrow">Oferta</p>
-            <h2>Co mogę dla Ciebie zrobić?</h2>
+            <h2>Robię strony, które klient od razu rozumie.</h2>
           </div>
-          <p>Na start najważniejsze jest jedno: klient ma wejść na stronę, zrozumieć ofertę i szybko się skontaktować.</p>
+          <p>
+            Najważniejsze nie jest samo „ładnie wygląda”. Strona ma pokazać, czym zajmuje się firma, zbudować zaufanie i szybko doprowadzić do telefonu, maila albo formularza.
+          </p>
         </div>
 
-        <div class="cards three">
-          <article class="card">
-            <div class="icon">🌐</div>
+        <div class="service-grid">
+          <article class="service-card">
+            <span>01</span>
             <h3>Strona wizytówka</h3>
-            <p>Prosta strona z ofertą, kontaktem, mapą, zdjęciami i przyciskiem telefonu.</p>
+            <p>Dla małej firmy, która potrzebuje eleganckiej obecności w internecie: oferta, kontakt, mapa, zdjęcia i podstawowe informacje.</p>
           </article>
-          <article class="card">
-            <div class="icon">🚀</div>
+          <article class="service-card">
+            <span>02</span>
             <h3>Landing page</h3>
-            <p>Jedna strona pod reklamę, konkretną usługę albo szybkie zbieranie zapytań.</p>
+            <p>Jedna mocna strona pod reklamę, konkretną usługę lub akcję promocyjną. Skupiona na jednym celu: zapytaniu od klienta.</p>
           </article>
-          <article class="card">
-            <div class="icon">🧩</div>
+          <article class="service-card">
+            <span>03</span>
             <h3>Strona firmowa</h3>
-            <p>Więcej sekcji, FAQ, oferta, opinie, galeria, formularz i podstawowe SEO.</p>
+            <p>Więcej sekcji, dokładniejsza oferta, FAQ, opinie, realizacje, formularz i struktura przygotowana pod rozwój.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section benefits-section">
-      <div class="container benefits-grid">
-        <div class="section-heading sticky-heading">
-          <p class="eyebrow">Co dostajesz</p>
-          <h2>Strona ma być prosta dla klienta i wygodna dla firmy.</h2>
-          <p>Nie wciskam zbędnych bajerów. Robimy to, co realnie pomaga: kontakt, oferta, zaufanie i szybka decyzja.</p>
+    <section class="section audience-section">
+      <div class="container audience-grid">
+        <div class="section-head compact">
+          <p class="eyebrow">Dla kogo</p>
+          <h2>Dla firm, które chcą wyglądać wiarygodnie, nawet bez dużego budżetu.</h2>
         </div>
-        <div class="benefits-list">
-          <div><strong>📱 Wersja mobilna</strong><span>Strona dobrze wygląda na telefonie.</span></div>
-          <div><strong>☎️ Telefon i e-mail</strong><span>Szybkie przyciski do kontaktu.</span></div>
-          <div><strong>🗺️ Mapa i lokalizacja</strong><span>Klient łatwo trafi do firmy.</span></div>
-          <div><strong>📝 Formularz zapytania</strong><span>Klient opisuje, czego potrzebuje.</span></div>
-          <div><strong>🔎 Podstawowe SEO</strong><span>Tytuły, opis strony i logiczna struktura.</span></div>
-          <div><strong>⚙️ Pomoc techniczna</strong><span>Pomoc przy publikacji, domenie i hostingu.</span></div>
+        <div class="audience-tags">
+          <span>gastronomia</span>
+          <span>beauty</span>
+          <span>barber</span>
+          <span>mechanik</span>
+          <span>transport</span>
+          <span>fachowcy</span>
+          <span>usługi lokalne</span>
+          <span>portfolio</span>
+          <span>mały sklep</span>
         </div>
       </div>
     </section>
 
-    <section class="section dark" id="pakiety">
+    <section class="section" id="pakiety">
       <div class="container">
-        <div class="section-heading center light-heading">
+        <div class="section-head center">
           <p class="eyebrow">Pakiety</p>
-          <h2>Prosty cennik na start</h2>
-          <p>Końcowa cena zależy od liczby sekcji, materiałów, poprawek i funkcji.</p>
+          <h2>Jasny zakres przed startem.</h2>
+          <p>Końcowa cena zależy od ilości treści, liczby sekcji, funkcji i materiałów, ale klient od początku wie, za co płaci.</p>
         </div>
 
-        <div class="pricing">
+        <div class="pricing-grid">
           <article class="price-card">
-            <h3>Start</h3>
-            <p class="price">od 499 zł</p>
+            <div class="price-top">
+              <h3>Start</h3>
+              <p>od 499 zł</p>
+            </div>
             <ul>
-              <li>prosta wizytówka</li>
-              <li>kontakt, mapa, oferta</li>
+              <li>prosta strona wizytówka</li>
+              <li>sekcje: oferta, kontakt, mapa</li>
               <li>wersja na telefon</li>
-              <li>pomoc z publikacją</li>
+              <li>pomoc przy publikacji</li>
             </ul>
-            <button class="choose-package" data-package="Start - od 499 zł">Zapytaj o Start</button>
+            <button class="btn btn-dark choose-package" data-package="Start — od 499 zł">Zapytaj o Start</button>
           </article>
 
           <article class="price-card featured">
-            <div class="badge">Najczęściej wybierany</div>
-            <h3>Firma</h3>
-            <p class="price">od 999 zł</p>
+            <div class="recommended">Najczęściej wybierany</div>
+            <div class="price-top">
+              <h3>Firma</h3>
+              <p>od 999 zł</p>
+            </div>
             <ul>
               <li>pełna strona firmowa</li>
-              <li>sekcje oferty i opinii</li>
-              <li>formularz kontaktowy</li>
-              <li>FAQ i podstawowe SEO</li>
+              <li>oferta, FAQ, opinie, formularz</li>
+              <li>podstawowe SEO</li>
+              <li>lepsze dopracowanie wizualne</li>
             </ul>
-            <button class="choose-package" data-package="Firma - od 999 zł">Zapytaj o Firmę</button>
+            <button class="btn btn-primary choose-package" data-package="Firma — od 999 zł">Zapytaj o Firmę</button>
           </article>
 
           <article class="price-card">
-            <h3>Premium</h3>
-            <p class="price">od 1499 zł</p>
+            <div class="price-top">
+              <h3>Premium</h3>
+              <p>od 1499 zł</p>
+            </div>
             <ul>
               <li>więcej sekcji lub podstron</li>
-              <li>lepsze dopracowanie wyglądu</li>
-              <li>rozbudowana oferta</li>
-              <li>więcej poprawek</li>
+              <li>bardziej indywidualny projekt</li>
+              <li>rozbudowany formularz</li>
+              <li>więcej poprawek i wdrożenia</li>
             </ul>
-            <button class="choose-package" data-package="Premium - od 1499 zł">Zapytaj o Premium</button>
+            <button class="btn btn-dark choose-package" data-package="Premium — od 1499 zł">Zapytaj o Premium</button>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section" id="demo">
+    <section class="section section-dark" id="jak-dzialam">
       <div class="container">
-        <div class="section-heading split">
-          <div>
-            <p class="eyebrow">Przykłady</p>
-            <h2>Strony demo dla różnych branż</h2>
-          </div>
-          <p>Klient nie musi sobie wyobrażać. Kliknie demo i zobaczy, jak może wyglądać jego strona.</p>
+        <div class="section-head center light">
+          <p class="eyebrow">Proces</p>
+          <h2>Profesjonalnie, ale bez korporacyjnego chaosu.</h2>
+          <p>Klient ma wiedzieć, co się dzieje, ile to kosztuje i co dostanie na końcu.</p>
         </div>
 
-        <div class="demo-grid">
-          <a class="demo-card" href="demo/kebab/">
-            <span>🥙</span>
-            <h3>Demo kebab</h3>
-            <p>Menu, promocje, zamówienie i lokal.</p>
-          </a>
-          <a class="demo-card" href="demo/mechanik/">
-            <span>🔧</span>
-            <h3>Demo mechanik</h3>
-            <p>Usługi, cennik, kontakt i mapa.</p>
-          </a>
-          <a class="demo-card" href="demo/beauty/">
-            <span>💅</span>
-            <h3>Demo beauty</h3>
-            <p>Oferta, zdjęcia, rezerwacja i opinie.</p>
-          </a>
-          <a class="demo-card" href="demo/transport/">
-            <span>🚚</span>
-            <h3>Demo transport</h3>
-            <p>Flota, usługi, formularz zapytania.</p>
-          </a>
+        <div class="process-grid">
+          <div class="process-step"><span>01</span><h3>Krótka rozmowa</h3><p>Ustalamy branżę, cel strony, potrzebne sekcje i materiały.</p></div>
+          <div class="process-step"><span>02</span><h3>Zakres i wycena</h3><p>Przed startem wiadomo, co obejmuje projekt i jaka jest cena.</p></div>
+          <div class="process-step"><span>03</span><h3>Projekt i treść</h3><p>Układam stronę tak, żeby była czytelna, estetyczna i sprzedażowa.</p></div>
+          <div class="process-step"><span>04</span><h3>Poprawki</h3><p>Wprowadzamy sensowne zmiany, bez robienia bałaganu w projekcie.</p></div>
+          <div class="process-step"><span>05</span><h3>Publikacja</h3><p>Pomagam z domeną, hostingiem, GitHub Pages albo przekazaniem plików.</p></div>
         </div>
       </div>
     </section>
 
-    <section class="section process-section" id="proces">
-      <div class="container">
-        <div class="section-heading center">
-          <p class="eyebrow">Proces</p>
-          <h2>Jak wygląda współpraca?</h2>
+    <section class="section quality-section">
+      <div class="container quality-grid">
+        <div class="section-head compact">
+          <p class="eyebrow">Jakość</p>
+          <h2>Strona ma dobrze wyglądać i działać normalnie na każdym urządzeniu.</h2>
+          <p>Dlatego pilnuję układu mobilnego, przycisków kontaktu, czytelnej typografii, sensownego formularza i braku martwych linków.</p>
         </div>
-        <div class="steps">
-          <div class="step"><span>01</span><h3>Krótka rozmowa</h3><p>Ustalamy branżę, cel strony, styl i materiały.</p></div>
-          <div class="step"><span>02</span><h3>Zakres i cena</h3><p>Wiesz, co dostajesz i ile to kosztuje przed startem.</p></div>
-          <div class="step"><span>03</span><h3>Projekt strony</h3><p>Przygotowuję pierwszą wersję i pokazuję ją do sprawdzenia.</p></div>
-          <div class="step"><span>04</span><h3>Poprawki</h3><p>Wprowadzam poprawki, żeby strona pasowała do firmy.</p></div>
-          <div class="step"><span>05</span><h3>Publikacja</h3><p>Pomagam z domeną, hostingiem albo GitHub Pages.</p></div>
+        <div class="check-panel">
+          <div><strong>Responsywność</strong><span>telefon, tablet i komputer</span></div>
+          <div><strong>Kontakt</strong><span>telefon, e-mail i formularz</span></div>
+          <div><strong>Treść</strong><span>prosto, konkretnie, bez lania wody</span></div>
+          <div><strong>Technicznie</strong><span>porządek w plikach i podstawowe SEO</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-white" id="przyklady">
+      <div class="container">
+        <div class="section-head split">
+          <div>
+            <p class="eyebrow">Przykłady</p>
+            <h2>Przykładowe kierunki stron demo.</h2>
+          </div>
+          <p>Demo branżowe przygotujemy jako osobne podstrony. Na razie karty nie prowadzą do pustych linków — kliknięcie przenosi do formularza i wpisuje temat.</p>
+        </div>
+
+        <div class="example-grid">
+          <button class="example-card" data-template="Demo dla gastronomii / kebaba">
+            <span>Gastro</span>
+            <h3>Restauracja / kebab</h3>
+            <p>Menu, promocje, godziny, mapa, telefon, zamówienia.</p>
+          </button>
+          <button class="example-card" data-template="Demo dla mechanika / warsztatu">
+            <span>Auto</span>
+            <h3>Mechanik / warsztat</h3>
+            <p>Usługi, cennik, szybki kontakt, lokalizacja i zaufanie.</p>
+          </button>
+          <button class="example-card" data-template="Demo dla salonu beauty">
+            <span>Beauty</span>
+            <h3>Salon beauty</h3>
+            <p>Oferta, galeria, opinie, rezerwacja i cennik.</p>
+          </button>
+          <button class="example-card" data-template="Demo dla firmy transportowej">
+            <span>Transport</span>
+            <h3>Transport / usługi</h3>
+            <p>Zakres usług, formularz wyceny, flota i obsługiwane trasy.</p>
+          </button>
         </div>
       </div>
     </section>
 
     <section class="section faq-section">
       <div class="container narrow">
-        <div class="section-heading center">
+        <div class="section-head center">
           <p class="eyebrow">FAQ</p>
-          <h2>Najczęstsze pytania</h2>
+          <h2>Najczęstsze pytania przed startem.</h2>
         </div>
-        <div class="faq">
-          <button class="faq-question">Czy muszę mieć gotowe teksty i zdjęcia?<span>+</span></button>
-          <div class="faq-answer">Nie musisz mieć wszystkiego. Najlepiej, gdy masz logo, zdjęcia firmy i krótką listę usług. Teksty mogę pomóc ułożyć prosto i sprzedażowo.</div>
+        <div class="faq-list">
+          <button class="faq-question" type="button">Czy muszę mieć gotowe teksty i zdjęcia?<span>+</span></button>
+          <div class="faq-answer">Nie. Najlepiej mieć logo, zdjęcia i listę usług, ale mogę pomóc ułożyć prostą treść pod stronę.</div>
 
-          <button class="faq-question">Czy pomagasz z domeną i hostingiem?<span>+</span></button>
-          <div class="faq-answer">Tak. Mogę doradzić, co kupić i jak to podpiąć. Na start nie trzeba przepłacać.</div>
+          <button class="faq-question" type="button">Czy pomagasz z domeną i hostingiem?<span>+</span></button>
+          <div class="faq-answer">Tak. Doradzam, czy wystarczy GitHub Pages, zwykły hosting, czy lepiej iść w inne rozwiązanie.</div>
 
-          <button class="faq-question">Czy strona będzie działać na telefonie?<span>+</span></button>
-          <div class="faq-answer">Tak. Strona jest robiona tak, żeby dobrze wyglądała na telefonie, tablecie i komputerze.</div>
+          <button class="faq-question" type="button">Czy formularz działa bez backendu?<span>+</span></button>
+          <div class="faq-answer">Obecnie formularz przygotowuje gotową wiadomość e-mail przez mailto. To dobre na start. Później można podpiąć normalną obsługę formularzy.</div>
         </div>
       </div>
     </section>
 
     <section class="contact-section" id="kontakt">
       <div class="container contact-grid">
-        <div class="contact-copy">
+        <div class="contact-info">
           <p class="eyebrow">Kontakt</p>
-          <h2>Napisz, jakiej strony potrzebujesz.</h2>
-          <p>W formularzu podaj branżę, typ strony, budżet i czego oczekujesz. Na tej podstawie łatwiej przygotować konkretną wycenę.</p>
+          <h2>Opisz krótko, jakiej strony potrzebujesz.</h2>
+          <p>
+            Wybierz typ strony, budżet, oczekiwane elementy i zostaw telefon albo e-mail. Formularz przygotuje wiadomość, którą możesz od razu wysłać.
+          </p>
 
-          <div class="contact-cards">
-            <a href="tel:+48000000000" class="contact-card">
-              <span>📞 Telefon</span>
+          <div class="contact-boxes">
+            <a href="tel:+48000000000" class="contact-box">
+              <span>Telefon</span>
               <strong>+48 000 000 000</strong>
               <small>kliknij, aby zadzwonić</small>
             </a>
-            <a href="mailto:kontakt@example.pl" class="contact-card">
-              <span>✉️ E-mail</span>
+            <a href="mailto:kontakt@example.pl" class="contact-box">
+              <span>E-mail</span>
               <strong>kontakt@example.pl</strong>
               <small>kliknij, aby napisać</small>
             </a>
@@ -292,18 +310,18 @@
         </div>
 
         <form class="contact-form" id="contactForm">
-          <div class="form-row">
+          <div class="form-grid two">
             <label>
               Imię i nazwisko
               <input type="text" name="name" placeholder="np. Paweł Kowalski" required>
             </label>
             <label>
               Firma / branża
-              <input type="text" name="company" placeholder="np. kebab, barber, mechanik">
+              <input type="text" name="company" placeholder="np. barber, mechanik, transport">
             </label>
           </div>
 
-          <div class="form-row">
+          <div class="form-grid two">
             <label>
               Telefon
               <input type="tel" name="phone" placeholder="np. 500 000 000">
@@ -314,11 +332,11 @@
             </label>
           </div>
 
-          <div class="form-row">
+          <div class="form-grid two">
             <label>
               Typ strony
               <select name="siteType" id="siteType">
-                <option value="Nie wybrano">Wybierz typ strony</option>
+                <option value="Nie wybrano">Wybierz</option>
                 <option value="Strona wizytówka">Strona wizytówka</option>
                 <option value="Landing page">Landing page</option>
                 <option value="Strona firmowa">Strona firmowa</option>
@@ -330,7 +348,7 @@
             <label>
               Budżet
               <select name="budget">
-                <option value="Nie podano">Wybierz budżet</option>
+                <option value="Nie podano">Wybierz</option>
                 <option value="do 500 zł">do 500 zł</option>
                 <option value="500-1000 zł">500-1000 zł</option>
                 <option value="1000-1500 zł">1000-1500 zł</option>
@@ -350,25 +368,25 @@
             </select>
           </label>
 
-          <div class="form-block">
-            <span class="form-label">Czego oczekujesz od strony?</span>
-            <div class="checkbox-grid">
-              <label><input type="checkbox" name="features" value="Oferta usług"> oferta usług</label>
-              <label><input type="checkbox" name="features" value="Galeria zdjęć"> galeria zdjęć</label>
-              <label><input type="checkbox" name="features" value="Mapa Google"> mapa Google</label>
-              <label><input type="checkbox" name="features" value="Formularz kontaktowy"> formularz kontaktowy</label>
-              <label><input type="checkbox" name="features" value="Przycisk telefonu"> przycisk telefonu</label>
-              <label><input type="checkbox" name="features" value="Opinie klientów"> opinie klientów</label>
-              <label><input type="checkbox" name="features" value="Cennik"> cennik</label>
+          <fieldset class="features-fieldset">
+            <legend>Czego oczekujesz od strony?</legend>
+            <div class="feature-grid">
+              <label><input type="checkbox" name="features" value="Oferta usług"> Oferta usług</label>
+              <label><input type="checkbox" name="features" value="Galeria zdjęć"> Galeria zdjęć</label>
+              <label><input type="checkbox" name="features" value="Mapa Google"> Mapa Google</label>
+              <label><input type="checkbox" name="features" value="Formularz kontaktowy"> Formularz</label>
+              <label><input type="checkbox" name="features" value="Telefon i e-mail"> Telefon i e-mail</label>
+              <label><input type="checkbox" name="features" value="Opinie klientów"> Opinie</label>
+              <label><input type="checkbox" name="features" value="Cennik"> Cennik</label>
               <label><input type="checkbox" name="features" value="FAQ"> FAQ</label>
-              <label><input type="checkbox" name="features" value="Podstawowe SEO"> podstawowe SEO</label>
-              <label><input type="checkbox" name="features" value="Pomoc z domeną/hostingiem"> domena / hosting</label>
+              <label><input type="checkbox" name="features" value="Podstawowe SEO"> Podstawowe SEO</label>
+              <label><input type="checkbox" name="features" value="Pomoc z domeną i hostingiem"> Domena / hosting</label>
             </div>
-          </div>
+          </fieldset>
 
           <label>
-            Opisz krótko, o co chodzi
-            <textarea name="message" rows="5" placeholder="Np. Potrzebuję strony dla salonu beauty. Mam logo i zdjęcia. Chcę ofertę, cennik, mapę i formularz kontaktowy." required></textarea>
+            Krótki opis projektu
+            <textarea name="message" rows="5" placeholder="Np. Potrzebuję strony dla warsztatu. Chcę ofertę usług, cennik, mapę, zdjęcia i formularz kontaktowy." required></textarea>
           </label>
 
           <label class="consent">
@@ -376,17 +394,17 @@
             <span>Rozumiem, że formularz przygotuje wiadomość e-mail w moim programie pocztowym.</span>
           </label>
 
-          <button type="submit" class="btn btn-primary full">Przygotuj wiadomość do wysłania</button>
-          <p class="form-note" id="formNote">Podaj telefon lub e-mail, żebym mógł odpisać.</p>
+          <button type="submit" class="btn btn-primary full">Przygotuj wiadomość</button>
+          <p class="form-note" id="formNote">Podaj telefon albo e-mail, żebym mógł odpisać.</p>
         </form>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="container footer-content">
-      <p>© <span id="year"></span> PawełStrony — strony internetowe dla małych firm.</p>
-      <a href="#start">Wróć na górę ↑</a>
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> Paweł Web Design. Strony internetowe dla małych firm.</p>
+      <a href="#start">Wróć na górę</a>
     </div>
   </footer>
 
