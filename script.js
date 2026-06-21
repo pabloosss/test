@@ -5,11 +5,12 @@ const contactForm = document.querySelector('#contactForm');
 const formNote = document.querySelector('#formNote');
 const siteType = document.querySelector('#siteType');
 const packageButtons = document.querySelectorAll('.choose-package');
+const exampleButtons = document.querySelectorAll('.example-card');
 const faqQuestions = document.querySelectorAll('.faq-question');
 
-// Zmień te dane na prawdziwy telefon i mail.
-const contactEmail = 'kontakt@example.pl';
-const contactPhone = '+48 000 000 000';
+// TODO: podmień na prawdziwe dane kontaktowe.
+const CONTACT_EMAIL = 'kontakt@example.pl';
+const CONTACT_PHONE = '+48 000 000 000';
 
 if (year) {
   year.textContent = new Date().getFullYear();
@@ -17,12 +18,27 @@ if (year) {
 
 if (navToggle && navLinks) {
   navToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('open');
+    const isOpen = navLinks.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', String(isOpen));
   });
 
   navLinks.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => navLinks.classList.remove('open'));
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
   });
+}
+
+function scrollToContact() {
+  document.querySelector('#kontakt')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function setMessage(text) {
+  const messageField = document.querySelector('textarea[name="message"]');
+  if (messageField && !messageField.value.trim()) {
+    messageField.value = text;
+  }
 }
 
 packageButtons.forEach((button) => {
@@ -31,12 +47,20 @@ packageButtons.forEach((button) => {
       siteType.value = 'Strona firmowa';
     }
 
-    const messageField = document.querySelector('textarea[name="message"]');
-    if (messageField && !messageField.value.trim()) {
-      messageField.value = `Interesuje mnie pakiet: ${button.dataset.package}. Proszę o wycenę strony.`;
+    setMessage(`Interesuje mnie pakiet: ${button.dataset.package}. Proszę o krótką wycenę i informację, co będzie potrzebne do startu.`);
+    scrollToContact();
+  });
+});
+
+exampleButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const template = button.dataset.template || 'Przykładowa strona demo';
+    if (siteType) {
+      siteType.value = 'Strona firmowa';
     }
 
-    document.querySelector('#kontakt')?.scrollIntoView({ behavior: 'smooth' });
+    setMessage(`Interesuje mnie ${template}. Chcę podobną stronę dla mojej firmy.`);
+    scrollToContact();
   });
 });
 
@@ -44,7 +68,6 @@ faqQuestions.forEach((question) => {
   question.addEventListener('click', () => {
     question.classList.toggle('open');
     const sign = question.querySelector('span');
-
     if (sign) {
       sign.textContent = question.classList.contains('open') ? '−' : '+';
     }
@@ -79,28 +102,28 @@ if (contactForm) {
     }
 
     const subject = encodeURIComponent(`Wycena strony internetowej - ${selectedSiteType || 'zapytanie'}`);
-    const body = encodeURIComponent(
-      [
-        'Nowe zapytanie o stronę internetową',
-        '',
-        `Imię i nazwisko: ${name}`,
-        `Firma / branża: ${company || 'nie podano'}`,
-        `Telefon: ${phone || 'nie podano'}`,
-        `E-mail: ${email || 'nie podano'}`,
-        `Typ strony: ${selectedSiteType || 'nie wybrano'}`,
-        `Budżet: ${budget || 'nie podano'}`,
-        `Termin: ${deadline || 'nie podano'}`,
-        `Oczekiwane elementy: ${features.length ? features.join(', ') : 'nie wybrano'}`,
-        '',
-        'Opis:',
-        message
-      ].join('\n')
-    );
+    const body = encodeURIComponent([
+      'Nowe zapytanie o stronę internetową',
+      '',
+      `Imię i nazwisko: ${name}`,
+      `Firma / branża: ${company || 'nie podano'}`,
+      `Telefon: ${phone || 'nie podano'}`,
+      `E-mail: ${email || 'nie podano'}`,
+      `Typ strony: ${selectedSiteType || 'nie wybrano'}`,
+      `Budżet: ${budget || 'nie podano'}`,
+      `Termin: ${deadline || 'nie podano'}`,
+      `Oczekiwane elementy: ${features.length ? features.join(', ') : 'nie wybrano'}`,
+      '',
+      'Opis projektu:',
+      message,
+      '',
+      `Kontakt ze strony: ${CONTACT_PHONE}`
+    ].join('\n'));
 
-    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
 
     if (formNote) {
-      formNote.textContent = `Otwieram program pocztowy. Kontakt: ${contactEmail} / ${contactPhone}`;
+      formNote.textContent = `Otwieram program pocztowy. Dane kontaktowe: ${CONTACT_EMAIL} / ${CONTACT_PHONE}`;
       formNote.classList.remove('error');
     }
   });
