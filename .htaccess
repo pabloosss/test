@@ -1,0 +1,5 @@
+Options -Indexes
+
+<Files "app-config.php">
+  Require all denied
+</Files>
