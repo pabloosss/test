@@ -1,29 +1,53 @@
-# Strona Zarobki
+# Strona Zarobek
 
-Prosta strona ofertowa do zdobywania klientów na tworzenie stron internetowych.
+Strona reklamowa dla osoby tworzącej strony internetowe na zamówienie.
 
-## Co zawiera
+## Branch roboczy
 
-- `index.html` – struktura strony
-- `style.css` – wygląd strony
-- `script.js` – menu mobilne, wybór pakietu, FAQ i formularz mailto
+Pracujemy na branchu:
 
-## Sekcje strony
+```text
+moja-strona
+```
 
-1. Hero z hasłem i przyciskami
-2. Oferta usług
-3. Pakiety cenowe
-4. Proces współpracy
-5. FAQ
-6. Formularz kontaktowy
+## Co zawiera strona
 
-## Do poprawienia przed publikacją
+- oferta tworzenia stron internetowych
+- pakiety cenowe
+- sekcja przykładowych stron demo
+- proces współpracy
+- FAQ
+- telefon i e-mail kontaktowy
+- rozbudowany formularz zapytania o stronę
 
-- zmienić adres `kontakt@example.pl` w pliku `script.js`
-- dodać prawdziwe dane kontaktowe
-- dodać własne realizacje / portfolio
-- podpiąć domenę albo GitHub Pages
+## Formularz kontaktowy pyta o
 
-## Proponowana nazwa repo
+- imię i nazwisko
+- firmę / branżę
+- telefon
+- e-mail
+- typ strony
+- budżet
+- termin
+- oczekiwane elementy strony
+- opis potrzeb klienta
 
-`strona-zarobki`
+## Do uzupełnienia przed publikacją
+
+W plikach `index.html` i `script.js` trzeba zmienić dane tymczasowe:
+
+```text
++48 000 000 000
+kontakt@example.pl
+```
+
+na prawdziwy telefon i prawdziwy adres e-mail.
+
+## Plan folderów demo
+
+```text
+demo/kebab/
+demo/mechanik/
+demo/beauty/
+demo/transport/
+```
