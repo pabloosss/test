@@ -3,323 +3,390 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kebab King — przykładowa strona kebabowni</title>
-  <meta name="description" content="Nowoczesna strona kebabowni z menu, promocjami, personalizacją zamówienia, lokalizacją i szybkim kontaktem." />
-  <link rel="preconnect" href="https://images.unsplash.com">
+  <title>Strony internetowe na zamówienie | Paweł</title>
+  <meta name="description" content="Tworzę proste i nowoczesne strony internetowe dla małych firm. Strony wizytówki, landing page, strony firmowe i przykładowe demo dla branż." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="deal-bar">
-    <strong>🔥 Dzisiaj:</strong> zestaw lunchowy od 32,50 zł · odbiór własny 15–20 min · sos ostry gratis do każdego mega rollo
+  <div class="top-bar">
+    <span>Strony dla małych firm</span>
+    <strong>od 499 zł</strong>
+    <span>szybka wycena · prosty kontakt · pomoc z publikacją</span>
   </div>
 
   <header class="site-header">
     <nav class="nav container" aria-label="Główna nawigacja">
-      <a class="brand" href="#hero" aria-label="Kebab King strona główna">
-        <span class="brand-mark">K</span>
-        <span class="brand-text">Kebab<span>King</span></span>
+      <a class="brand" href="#start" aria-label="Strona główna">
+        <span class="brand-mark">P</span>
+        <span class="brand-text">Paweł<span>Strony</span></span>
       </a>
       <button class="nav-toggle" id="navToggle" aria-label="Otwórz menu">☰</button>
       <div class="nav-links" id="navLinks">
-        <a href="#menu">Menu</a>
-        <a href="#promocje">Promocje</a>
-        <a href="#personalizacja">Zamówienie</a>
-        <a href="#lokal">Lokal</a>
+        <a href="#oferta">Oferta</a>
+        <a href="#pakiety">Pakiety</a>
+        <a href="#demo">Demo</a>
+        <a href="#proces">Proces</a>
         <a href="#kontakt" class="nav-cta">Kontakt</a>
       </div>
     </nav>
   </header>
 
   <main>
-    <section class="hero" id="hero">
+    <section class="hero" id="start">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">Kebab · grill · boxy · odbiór własny</p>
-          <h1>Strona kebabowni, która od razu prowadzi do zamówienia.</h1>
+          <p class="eyebrow">Strony internetowe na zamówienie</p>
+          <h1>Robię proste strony internetowe dla małych firm.</h1>
           <p class="hero-text">
-            Duże apetyczne zdjęcia, szybkie kafelki jak w dużych sieciach, czytelne menu i konfigurator: mięso, rozmiar, sos, dodatki oraz forma odbioru.
+            Szybko, konkretnie i bez przepłacania. Strona wizytówka, landing page, portfolio albo strona firmowa z ofertą, mapą, kontaktem i formularzem zapytania.
           </p>
 
           <div class="hero-actions">
-            <a href="#personalizacja" class="btn btn-primary">Skonfiguruj kebaba</a>
-            <a href="#menu" class="btn btn-secondary">Zobacz menu</a>
+            <a href="#kontakt" class="btn btn-primary">Zapytaj o wycenę</a>
+            <a href="#demo" class="btn btn-secondary">Zobacz przykłady</a>
           </div>
 
-          <div class="hero-stats" aria-label="Najważniejsze informacje">
-            <div><strong>15–20 min</strong><span>średni odbiór</span></div>
-            <div><strong>4.8/5</strong><span>oceny klientów</span></div>
-            <div><strong>8 kategorii</strong><span>menu i dodatki</span></div>
+          <div class="contact-pills" aria-label="Szybki kontakt">
+            <a href="tel:+48000000000">📞 +48 000 000 000</a>
+            <a href="mailto:kontakt@example.pl">✉️ kontakt@example.pl</a>
+          </div>
+
+          <div class="hero-stats">
+            <div><strong>od 499 zł</strong><span>prosty start</span></div>
+            <div><strong>kilka dni</strong><span>przy gotowych materiałach</span></div>
+            <div><strong>mobile</strong><span>dobrze wygląda na telefonie</span></div>
           </div>
         </div>
 
-        <div class="hero-visual">
-          <div class="hero-photo photo-shell">
-            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1400&q=85" alt="Grillowane jedzenie i kebab" data-fallback>
-            <div class="photo-fallback">🥙</div>
-          </div>
-          <div class="hero-offer-card">
-            <span>Najczęściej wybierane</span>
-            <strong>Mega rollo mieszane</strong>
-            <small>mięso + frytki + warzywa + sos</small>
-            <em>od 34,00 zł</em>
+        <div class="hero-panel" aria-label="Podgląd przykładowej strony">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="site-preview">
+            <div class="preview-top">
+              <span>Twoja firma</span>
+              <button>Kontakt</button>
+            </div>
+            <h2>Nowoczesna strona dla lokalnego biznesu</h2>
+            <p>Oferta, zdjęcia, opinie, mapa, telefon i formularz zapytania w jednym miejscu.</p>
+            <div class="preview-grid">
+              <div></div><div></div><div></div>
+            </div>
+            <div class="preview-form">
+              <span>Imię i telefon</span>
+              <span>Czego potrzebujesz?</span>
+              <button>Wyślij zapytanie</button>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="quick-tiles container" aria-label="Szybkie akcje">
-      <a href="#personalizacja" class="quick-tile tile-red">
-        <span>Zamów online</span>
-        <strong>Personalizacja krok po kroku</strong>
-      </a>
-      <a href="#promocje" class="quick-tile tile-yellow">
-        <span>Promocje</span>
-        <strong>Zestawy lunchowe i kupony</strong>
-      </a>
-      <a href="#lokal" class="quick-tile tile-dark">
-        <span>Lokal</span>
-        <strong>Mapa, godziny i telefon</strong>
-      </a>
-      <a href="#opinie" class="quick-tile tile-green">
-        <span>Opinie</span>
-        <strong>Wiarygodność przed zakupem</strong>
-      </a>
+    <section class="section target-section">
+      <div class="container">
+        <div class="section-heading center">
+          <p class="eyebrow">Dla kogo</p>
+          <h2>Dla firm, które chcą wyglądać dobrze w internecie i łatwo zbierać zapytania.</h2>
+        </div>
+        <div class="target-tags">
+          <span>kebab</span>
+          <span>barber</span>
+          <span>mechanik</span>
+          <span>kosmetyczka</span>
+          <span>restauracja</span>
+          <span>transport</span>
+          <span>fachowiec</span>
+          <span>sklep lokalny</span>
+          <span>usługi</span>
+        </div>
+      </div>
     </section>
 
-    <section class="section" id="promocje">
+    <section class="section" id="oferta">
       <div class="container">
         <div class="section-heading split">
           <div>
-            <p class="eyebrow">Promocje i nowości</p>
-            <h2>Duże kafle jak w KFC i McDonald's, ale pod lokalny kebab.</h2>
+            <p class="eyebrow">Oferta</p>
+            <h2>Co mogę dla Ciebie zrobić?</h2>
           </div>
-          <p>
-            Klient nie powinien szukać. Na start widzi promocję, bestseller i szybki skrót do zamówienia.
-          </p>
+          <p>Na start najważniejsze jest jedno: klient ma wejść na stronę, zrozumieć ofertę i szybko się skontaktować.</p>
         </div>
 
-        <div class="promo-grid">
-          <article class="promo-card promo-large">
-            <div>
-              <span class="label">Lunch</span>
-              <h3>Lawasz + frytki + napój</h3>
-              <p>Najprostszy zestaw do promowania od poniedziałku do piątku.</p>
-              <a href="#personalizacja" class="btn btn-light">Zamów zestaw</a>
-            </div>
+        <div class="cards three">
+          <article class="card">
+            <div class="icon">🌐</div>
+            <h3>Strona wizytówka</h3>
+            <p>Prosta strona z ofertą, kontaktem, mapą, zdjęciami i przyciskiem telefonu.</p>
           </article>
-          <article class="promo-card promo-small promo-red">
-            <span class="label">Ostry hit</span>
-            <h3>Adana grill</h3>
-            <p>Premium pozycja dla osób, które chcą coś więcej niż zwykłe rollo.</p>
+          <article class="card">
+            <div class="icon">🚀</div>
+            <h3>Landing page</h3>
+            <p>Jedna strona pod reklamę, konkretną usługę albo szybkie zbieranie zapytań.</p>
           </article>
-          <article class="promo-card promo-small promo-yellow">
-            <span class="label">Program</span>
-            <h3>10. kebab gratis</h3>
-            <p>Prosty pomysł na lojalność bez drogiej aplikacji.</p>
+          <article class="card">
+            <div class="icon">🧩</div>
+            <h3>Strona firmowa</h3>
+            <p>Więcej sekcji, FAQ, oferta, opinie, galeria, formularz i podstawowe SEO.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section menu-section" id="menu">
+    <section class="section benefits-section">
+      <div class="container benefits-grid">
+        <div class="section-heading sticky-heading">
+          <p class="eyebrow">Co dostajesz</p>
+          <h2>Strona ma być prosta dla klienta i wygodna dla firmy.</h2>
+          <p>Nie wciskam zbędnych bajerów. Robimy to, co realnie pomaga: kontakt, oferta, zaufanie i szybka decyzja.</p>
+        </div>
+        <div class="benefits-list">
+          <div><strong>📱 Wersja mobilna</strong><span>Strona dobrze wygląda na telefonie.</span></div>
+          <div><strong>☎️ Telefon i e-mail</strong><span>Szybkie przyciski do kontaktu.</span></div>
+          <div><strong>🗺️ Mapa i lokalizacja</strong><span>Klient łatwo trafi do firmy.</span></div>
+          <div><strong>📝 Formularz zapytania</strong><span>Klient opisuje, czego potrzebuje.</span></div>
+          <div><strong>🔎 Podstawowe SEO</strong><span>Tytuły, opis strony i logiczna struktura.</span></div>
+          <div><strong>⚙️ Pomoc techniczna</strong><span>Pomoc przy publikacji, domenie i hostingu.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dark" id="pakiety">
+      <div class="container">
+        <div class="section-heading center light-heading">
+          <p class="eyebrow">Pakiety</p>
+          <h2>Prosty cennik na start</h2>
+          <p>Końcowa cena zależy od liczby sekcji, materiałów, poprawek i funkcji.</p>
+        </div>
+
+        <div class="pricing">
+          <article class="price-card">
+            <h3>Start</h3>
+            <p class="price">od 499 zł</p>
+            <ul>
+              <li>prosta wizytówka</li>
+              <li>kontakt, mapa, oferta</li>
+              <li>wersja na telefon</li>
+              <li>pomoc z publikacją</li>
+            </ul>
+            <button class="choose-package" data-package="Start - od 499 zł">Zapytaj o Start</button>
+          </article>
+
+          <article class="price-card featured">
+            <div class="badge">Najczęściej wybierany</div>
+            <h3>Firma</h3>
+            <p class="price">od 999 zł</p>
+            <ul>
+              <li>pełna strona firmowa</li>
+              <li>sekcje oferty i opinii</li>
+              <li>formularz kontaktowy</li>
+              <li>FAQ i podstawowe SEO</li>
+            </ul>
+            <button class="choose-package" data-package="Firma - od 999 zł">Zapytaj o Firmę</button>
+          </article>
+
+          <article class="price-card">
+            <h3>Premium</h3>
+            <p class="price">od 1499 zł</p>
+            <ul>
+              <li>więcej sekcji lub podstron</li>
+              <li>lepsze dopracowanie wyglądu</li>
+              <li>rozbudowana oferta</li>
+              <li>więcej poprawek</li>
+            </ul>
+            <button class="choose-package" data-package="Premium - od 1499 zł">Zapytaj o Premium</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
       <div class="container">
         <div class="section-heading split">
           <div>
-            <p class="eyebrow">Menu</p>
-            <h2>Menu ma być szybkie do skanowania na telefonie.</h2>
+            <p class="eyebrow">Przykłady</p>
+            <h2>Strony demo dla różnych branż</h2>
           </div>
-          <p>
-            Kafelki mają zdjęcia, cenę, kategorię i przycisk „Personalizuj”. To lepsze niż sama długa lista produktów.
-          </p>
+          <p>Klient nie musi sobie wyobrażać. Kliknie demo i zobaczy, jak może wyglądać jego strona.</p>
         </div>
 
-        <div class="category-tabs" id="categoryTabs" aria-label="Filtry menu">
-          <button class="active" data-category="all">Wszystko</button>
-          <button data-category="lawasz">Lawasz</button>
-          <button data-category="box">Boxy</button>
-          <button data-category="talerz">Talerze</button>
-          <button data-category="grill">Grill</button>
-          <button data-category="vege">Vege</button>
-          <button data-category="dodatki">Dodatki</button>
+        <div class="demo-grid">
+          <a class="demo-card" href="demo/kebab/">
+            <span>🥙</span>
+            <h3>Demo kebab</h3>
+            <p>Menu, promocje, zamówienie i lokal.</p>
+          </a>
+          <a class="demo-card" href="demo/mechanik/">
+            <span>🔧</span>
+            <h3>Demo mechanik</h3>
+            <p>Usługi, cennik, kontakt i mapa.</p>
+          </a>
+          <a class="demo-card" href="demo/beauty/">
+            <span>💅</span>
+            <h3>Demo beauty</h3>
+            <p>Oferta, zdjęcia, rezerwacja i opinie.</p>
+          </a>
+          <a class="demo-card" href="demo/transport/">
+            <span>🚚</span>
+            <h3>Demo transport</h3>
+            <p>Flota, usługi, formularz zapytania.</p>
+          </a>
         </div>
-
-        <div class="menu-grid" id="menuGrid"></div>
       </div>
     </section>
 
-    <section class="section order-section" id="personalizacja">
-      <div class="container order-layout">
-        <div class="order-copy">
-          <p class="eyebrow">Personalizacja zamówienia</p>
-          <h2>Klient sam wybiera, jakiego kebaba chce.</h2>
-          <p>
-            To jest największa poprawka: nie tylko przycisk „Dodaj”, ale konkretne wybory jak w prawdziwym systemie zamówień.
-          </p>
+    <section class="section process-section" id="proces">
+      <div class="container">
+        <div class="section-heading center">
+          <p class="eyebrow">Proces</p>
+          <h2>Jak wygląda współpraca?</h2>
+        </div>
+        <div class="steps">
+          <div class="step"><span>01</span><h3>Krótka rozmowa</h3><p>Ustalamy branżę, cel strony, styl i materiały.</p></div>
+          <div class="step"><span>02</span><h3>Zakres i cena</h3><p>Wiesz, co dostajesz i ile to kosztuje przed startem.</p></div>
+          <div class="step"><span>03</span><h3>Projekt strony</h3><p>Przygotowuję pierwszą wersję i pokazuję ją do sprawdzenia.</p></div>
+          <div class="step"><span>04</span><h3>Poprawki</h3><p>Wprowadzam poprawki, żeby strona pasowała do firmy.</p></div>
+          <div class="step"><span>05</span><h3>Publikacja</h3><p>Pomagam z domeną, hostingiem albo GitHub Pages.</p></div>
+        </div>
+      </div>
+    </section>
 
-          <div class="order-benefits">
-            <div><strong>1</strong><span>wybór dania</span></div>
-            <div><strong>2</strong><span>mięso, rozmiar, sos</span></div>
-            <div><strong>3</strong><span>podsumowanie i kopiowanie</span></div>
+    <section class="section faq-section">
+      <div class="container narrow">
+        <div class="section-heading center">
+          <p class="eyebrow">FAQ</p>
+          <h2>Najczęstsze pytania</h2>
+        </div>
+        <div class="faq">
+          <button class="faq-question">Czy muszę mieć gotowe teksty i zdjęcia?<span>+</span></button>
+          <div class="faq-answer">Nie musisz mieć wszystkiego. Najlepiej, gdy masz logo, zdjęcia firmy i krótką listę usług. Teksty mogę pomóc ułożyć prosto i sprzedażowo.</div>
+
+          <button class="faq-question">Czy pomagasz z domeną i hostingiem?<span>+</span></button>
+          <div class="faq-answer">Tak. Mogę doradzić, co kupić i jak to podpiąć. Na start nie trzeba przepłacać.</div>
+
+          <button class="faq-question">Czy strona będzie działać na telefonie?<span>+</span></button>
+          <div class="faq-answer">Tak. Strona jest robiona tak, żeby dobrze wyglądała na telefonie, tablecie i komputerze.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-section" id="kontakt">
+      <div class="container contact-grid">
+        <div class="contact-copy">
+          <p class="eyebrow">Kontakt</p>
+          <h2>Napisz, jakiej strony potrzebujesz.</h2>
+          <p>W formularzu podaj branżę, typ strony, budżet i czego oczekujesz. Na tej podstawie łatwiej przygotować konkretną wycenę.</p>
+
+          <div class="contact-cards">
+            <a href="tel:+48000000000" class="contact-card">
+              <span>📞 Telefon</span>
+              <strong>+48 000 000 000</strong>
+              <small>kliknij, aby zadzwonić</small>
+            </a>
+            <a href="mailto:kontakt@example.pl" class="contact-card">
+              <span>✉️ E-mail</span>
+              <strong>kontakt@example.pl</strong>
+              <small>kliknij, aby napisać</small>
+            </a>
           </div>
         </div>
 
-        <form class="order-form" id="orderForm">
-          <div class="form-block">
-            <label for="productSelect">Danie</label>
-            <select id="productSelect" name="product"></select>
-          </div>
-
-          <div class="form-block">
-            <span class="form-label">Rozmiar</span>
-            <div class="choice-grid" data-choice-group="size">
-              <label class="choice-card"><input type="radio" name="size" value="standard" data-price="0" checked><span>Standard</span><small>normalna porcja</small></label>
-              <label class="choice-card"><input type="radio" name="size" value="mega" data-price="8"><span>Mega +8 zł</span><small>więcej mięsa</small></label>
-              <label class="choice-card"><input type="radio" name="size" value="kids" data-price="-5"><span>Mini -5 zł</span><small>mniejsza porcja</small></label>
-            </div>
-          </div>
-
-          <div class="form-block">
-            <span class="form-label">Mięso / baza</span>
-            <div class="choice-grid two">
-              <label class="choice-card"><input type="radio" name="meat" value="Kurczak" data-price="0" checked><span>Kurczak</span></label>
-              <label class="choice-card"><input type="radio" name="meat" value="Wołowina-baranina" data-price="4"><span>Wołowina +4 zł</span></label>
-              <label class="choice-card"><input type="radio" name="meat" value="Mieszane" data-price="5"><span>Mieszane +5 zł</span></label>
-              <label class="choice-card"><input type="radio" name="meat" value="Falafel" data-price="-2"><span>Falafel -2 zł</span></label>
-            </div>
-          </div>
-
-          <div class="form-block">
-            <span class="form-label">Sos</span>
-            <div class="chips">
-              <label><input type="checkbox" name="sauce" value="czosnkowy" checked> czosnkowy</label>
-              <label><input type="checkbox" name="sauce" value="łagodny"> łagodny</label>
-              <label><input type="checkbox" name="sauce" value="mieszany"> mieszany</label>
-              <label><input type="checkbox" name="sauce" value="ostry"> ostry</label>
-            </div>
-          </div>
-
-          <div class="form-block">
-            <span class="form-label">Dodatki w środku</span>
-            <div class="chips">
-              <label><input type="checkbox" name="inside" value="surówka" checked> surówka</label>
-              <label><input type="checkbox" name="inside" value="pomidor" checked> pomidor</label>
-              <label><input type="checkbox" name="inside" value="ogórek" checked> ogórek</label>
-              <label><input type="checkbox" name="inside" value="cebula"> cebula</label>
-              <label><input type="checkbox" name="inside" value="bez surówki"> bez surówki</label>
-            </div>
-          </div>
-
-          <div class="form-block">
-            <span class="form-label">Dodatki płatne</span>
-            <div class="extras-grid">
-              <label><input type="checkbox" name="extra" value="ser" data-price="4"> Ser +4 zł</label>
-              <label><input type="checkbox" name="extra" value="frytki w środku" data-price="6"> Frytki w środku +6 zł</label>
-              <label><input type="checkbox" name="extra" value="halloumi" data-price="8"> Halloumi +8 zł</label>
-              <label><input type="checkbox" name="extra" value="napój" data-price="7"> Napój +7 zł</label>
-            </div>
+        <form class="contact-form" id="contactForm">
+          <div class="form-row">
+            <label>
+              Imię i nazwisko
+              <input type="text" name="name" placeholder="np. Paweł Kowalski" required>
+            </label>
+            <label>
+              Firma / branża
+              <input type="text" name="company" placeholder="np. kebab, barber, mechanik">
+            </label>
           </div>
 
           <div class="form-row">
-            <div class="form-block">
-              <label for="quantity">Ilość</label>
-              <div class="qty-control">
-                <button type="button" id="qtyMinus">−</button>
-                <input id="quantity" name="quantity" type="number" min="1" max="20" value="1">
-                <button type="button" id="qtyPlus">+</button>
-              </div>
-            </div>
-            <div class="form-block">
-              <label for="modeSelect">Odbiór</label>
-              <select id="modeSelect" name="mode">
-                <option value="Odbiór własny" data-price="0">Odbiór własny</option>
-                <option value="Dostawa" data-price="6">Dostawa +6 zł</option>
-              </select>
-            </div>
+            <label>
+              Telefon
+              <input type="tel" name="phone" placeholder="np. 500 000 000">
+            </label>
+            <label>
+              E-mail
+              <input type="email" name="email" placeholder="np. kontakt@firma.pl">
+            </label>
           </div>
+
+          <div class="form-row">
+            <label>
+              Typ strony
+              <select name="siteType" id="siteType">
+                <option value="Nie wybrano">Wybierz typ strony</option>
+                <option value="Strona wizytówka">Strona wizytówka</option>
+                <option value="Landing page">Landing page</option>
+                <option value="Strona firmowa">Strona firmowa</option>
+                <option value="Portfolio">Portfolio</option>
+                <option value="Poprawki obecnej strony">Poprawki obecnej strony</option>
+                <option value="Nie wiem - potrzebuję doradzenia">Nie wiem - potrzebuję doradzenia</option>
+              </select>
+            </label>
+            <label>
+              Budżet
+              <select name="budget">
+                <option value="Nie podano">Wybierz budżet</option>
+                <option value="do 500 zł">do 500 zł</option>
+                <option value="500-1000 zł">500-1000 zł</option>
+                <option value="1000-1500 zł">1000-1500 zł</option>
+                <option value="1500+ zł">1500+ zł</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Termin
+            <select name="deadline">
+              <option value="Nie podano">Kiedy strona ma być gotowa?</option>
+              <option value="Jak najszybciej">Jak najszybciej</option>
+              <option value="Do tygodnia">Do tygodnia</option>
+              <option value="Do 2 tygodni">Do 2 tygodni</option>
+              <option value="Bez pośpiechu">Bez pośpiechu</option>
+            </select>
+          </label>
 
           <div class="form-block">
-            <label for="note">Uwagi</label>
-            <textarea id="note" name="note" rows="3" placeholder="Np. bez cebuli, bardzo ostry, sos osobno"></textarea>
+            <span class="form-label">Czego oczekujesz od strony?</span>
+            <div class="checkbox-grid">
+              <label><input type="checkbox" name="features" value="Oferta usług"> oferta usług</label>
+              <label><input type="checkbox" name="features" value="Galeria zdjęć"> galeria zdjęć</label>
+              <label><input type="checkbox" name="features" value="Mapa Google"> mapa Google</label>
+              <label><input type="checkbox" name="features" value="Formularz kontaktowy"> formularz kontaktowy</label>
+              <label><input type="checkbox" name="features" value="Przycisk telefonu"> przycisk telefonu</label>
+              <label><input type="checkbox" name="features" value="Opinie klientów"> opinie klientów</label>
+              <label><input type="checkbox" name="features" value="Cennik"> cennik</label>
+              <label><input type="checkbox" name="features" value="FAQ"> FAQ</label>
+              <label><input type="checkbox" name="features" value="Podstawowe SEO"> podstawowe SEO</label>
+              <label><input type="checkbox" name="features" value="Pomoc z domeną/hostingiem"> domena / hosting</label>
+            </div>
           </div>
+
+          <label>
+            Opisz krótko, o co chodzi
+            <textarea name="message" rows="5" placeholder="Np. Potrzebuję strony dla salonu beauty. Mam logo i zdjęcia. Chcę ofertę, cennik, mapę i formularz kontaktowy." required></textarea>
+          </label>
+
+          <label class="consent">
+            <input type="checkbox" required>
+            <span>Rozumiem, że formularz przygotuje wiadomość e-mail w moim programie pocztowym.</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary full">Przygotuj wiadomość do wysłania</button>
+          <p class="form-note" id="formNote">Podaj telefon lub e-mail, żebym mógł odpisać.</p>
         </form>
-
-        <aside class="summary-card" aria-live="polite">
-          <span class="summary-kicker">Podsumowanie</span>
-          <h3 id="summaryTitle">Lawasz Kurczak</h3>
-          <p id="summaryDetails">Wybierz opcje zamówienia.</p>
-          <div class="price-line"><span>Razem</span><strong id="summaryPrice">0,00 zł</strong></div>
-          <div class="summary-actions">
-            <button type="button" class="btn btn-primary" id="copyOrder">Kopiuj zamówienie</button>
-            <a class="btn btn-secondary" id="mailOrder" href="#">Wyślij e-mail</a>
-          </div>
-          <small id="copyStatus">Formularz demo — można podpiąć WhatsApp, Messenger, e-mail albo panel kuchni.</small>
-        </aside>
-      </div>
-    </section>
-
-    <section class="section location-section" id="lokal">
-      <div class="container location-grid">
-        <div class="location-photo photo-shell">
-          <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=85" alt="Lokal restauracyjny" data-fallback>
-          <div class="photo-fallback">📍</div>
-        </div>
-        <div class="location-card">
-          <p class="eyebrow">Lokal</p>
-          <h2>Najważniejsze informacje w jednym miejscu.</h2>
-          <div class="info-list">
-            <p><strong>📍 Adres:</strong> ul. Kebabowa 7, Warszawa</p>
-            <p><strong>☎ Telefon:</strong> <a href="tel:+48123456789">123 456 789</a></p>
-            <p><strong>🕒 Godziny:</strong> pon.–ndz. 10:00–23:00</p>
-            <p><strong>💳 Płatność:</strong> gotówka, karta, BLIK</p>
-          </div>
-          <a class="btn btn-primary" href="https://maps.google.com" target="_blank" rel="noreferrer">Otwórz mapę</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section reviews-section" id="opinie">
-      <div class="container">
-        <div class="section-heading center">
-          <p class="eyebrow">Opinie</p>
-          <h2>Zaufanie przed kliknięciem „zamów”.</h2>
-        </div>
-        <div class="reviews">
-          <article><strong>★★★★★</strong><p>„Czytelne menu, duże zdjęcia i szybkie zamówienie. Na telefonie wygląda bardzo dobrze.”</p><span>— Klient demo</span></article>
-          <article><strong>★★★★★</strong><p>„Konfigurator jest super — od razu wiem, co wybrałem i ile płacę.”</p><span>— Michał</span></article>
-          <article><strong>★★★★☆</strong><p>„Duże kafelki promocji są lepsze niż zwykła lista dań.”</p><span>— Kasia</span></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="contact" id="kontakt">
-      <div class="container contact-grid">
-        <div>
-          <p class="eyebrow">Kontakt</p>
-          <h2>Chcesz taką stronę dla kebabowni albo innej gastronomii?</h2>
-          <p>Napisz nazwę lokalu, miasto, menu i numer telefonu. Stronę można zrobić jako landing page, wizytówkę albo prosty system zamówień.</p>
-        </div>
-        <div class="contact-panel">
-          <a href="tel:+48123456789">📞 123 456 789</a>
-          <a href="mailto:kontakt@example.pl">✉ kontakt@example.pl</a>
-          <a href="#personalizacja">🥙 Przejdź do konfiguratora</a>
-        </div>
       </div>
     </section>
   </main>
 
-  <nav class="mobile-bar" aria-label="Szybkie akcje na telefonie">
-    <a href="#menu">Menu</a>
-    <a href="#personalizacja" class="mobile-main">Zamów</a>
-    <a href="tel:+48123456789">Telefon</a>
-  </nav>
-
   <footer class="footer">
     <div class="container footer-content">
-      <p>© <span id="year"></span> KebabKing. Demo strony dla gastronomii.</p>
-      <a href="#hero">Wróć na górę ↑</a>
+      <p>© <span id="year"></span> PawełStrony — strony internetowe dla małych firm.</p>
+      <a href="#start">Wróć na górę ↑</a>
     </div>
   </footer>
 
