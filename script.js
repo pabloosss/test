@@ -134,7 +134,7 @@ function injectCustomerFields() {
       <select id="paymentSelect">
         <option value="Płatność przy odbiorze">Płatność przy odbiorze</option>
         <option value="Karta przy odbiorze">Karta przy odbiorze</option>
-        <option value="BLIK / online">BLIK / online (demo)</option>
+        <option value="BLIK na telefon">BLIK na telefon — ręcznie</option>
       </select>
     </div>
   `);
@@ -256,7 +256,7 @@ async function sendOrderToServer() {
     const data = await response.json();
     if (!response.ok || !data.ok) throw new Error(data.error || 'Błąd wysyłki');
     if (data.payment_url) {
-      copyStatus.innerHTML = `Zamówienie zapisane. Numer: ${data.order_id}. <a href="${data.payment_url}">Przejdź do płatności</a>`;
+      copyStatus.innerHTML = `Zamówienie zapisane. Numer: ${data.order_id}. <a href="${data.payment_url}">Pokaż instrukcję BLIK</a>`;
     } else {
       copyStatus.textContent = data.mail_sent ? `Zamówienie wysłane. Numer: ${data.order_id}` : `Zamówienie zapisane, ale mail mógł nie wyjść. Numer: ${data.order_id}`;
     }
