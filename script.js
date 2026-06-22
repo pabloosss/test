@@ -81,32 +81,21 @@ document.querySelectorAll('img[data-fallback]').forEach((image) => image.addEven
 function formatPrice(value) {
   return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(Number(value || 0));
 }
-
 function plusPrice(value) {
   const price = Number(value || 0);
   if (price === 0) return '';
   return price > 0 ? ` +${formatPrice(price)}` : ` ${formatPrice(price)}`;
 }
-
-function activeItems(items = []) {
-  return items.filter((item) => item.active !== false);
-}
-
-function getProductById(id) {
-  return products.find((product) => product.id === id) || products[0] || fallbackMenu.products[0];
-}
-
-function getSelectedProduct() {
-  return getProductById(productSelect?.value);
-}
+function activeItems(items = []) { return items.filter((item) => item.active !== false); }
+function getProductById(id) { return products.find((product) => product.id === id) || products[0] || fallbackMenu.products[0]; }
+function getSelectedProduct() { return getProductById(productSelect?.value); }
+function getPaymentSelect() { return document.querySelector('#paymentSelect'); }
 
 function getAllowedItems(group) {
   const product = getSelectedProduct();
   const all = activeItems(menuData.ingredients[group] || []);
   const allowed = product?.allowed_options?.[group];
-
   if (!Array.isArray(allowed) || allowed.length === 0) return all;
-
   const allowedSet = new Set(allowed.map(String));
   const filtered = all.filter((item) => allowedSet.has(String(item.id)) || allowedSet.has(String(item.name)));
   return filtered.length ? filtered : all;
@@ -118,10 +107,7 @@ async function loadMenuFromServer() {
     if (!response.ok) throw new Error('no php menu');
     const data = await response.json();
     if (Array.isArray(data.products)) {
-      menuData = {
-        products: data.products.filter((p) => p.active !== false),
-        ingredients: { ...fallbackMenu.ingredients, ...(data.ingredients || {}) }
-      };
+      menuData = { products: data.products.filter((p) => p.active !== false), ingredients: { ...fallbackMenu.ingredients, ...(data.ingredients || {}) } };
       products = menuData.products;
     }
   } catch {
@@ -143,6 +129,14 @@ function injectCustomerFields() {
       <label for="customerAddress">Adres dostawy</label>
       <input id="customerAddress" type="text" placeholder="Ulica, numer, miasto">
     </div>
+    <div class="form-block">
+      <label for="paymentSelect">Płatność</label>
+      <select id="paymentSelect">
+        <option value="Płatność przy odbiorze">Płatność przy odbiorze</option>
+        <option value="Karta przy odbiorze">Karta przy odbiorze</option>
+        <option value="BLIK / online">BLIK / online (demo)</option>
+      </select>
+    </div>
   `);
 }
 
@@ -150,7 +144,6 @@ function renderProductOptions() {
   if (!productSelect) return;
   productSelect.innerHTML = products.map((p) => `<option value="${p.id}">${p.name} — od ${formatPrice(p.price)}</option>`).join('');
 }
-
 function renderRadio(container, name, items) {
   if (!container) return;
   const active = activeItems(items);
@@ -162,14 +155,12 @@ function renderRadio(container, name, items) {
     </label>
   `).join('');
 }
-
 function renderChecks(container, name, items, paid = false) {
   if (!container) return;
   container.innerHTML = activeItems(items).map((item) => `
     <label><input type="checkbox" name="${name}" value="${item.name}" data-price="${Number(item.price || 0)}" ${item.default ? 'checked' : ''}> ${item.label || item.name}${paid ? plusPrice(item.price) : ''}</label>
   `).join('');
 }
-
 function renderIngredients() {
   renderRadio(document.querySelector('[data-choice-group="size"]'), 'size', getAllowedItems('sizes'));
   renderRadio(document.querySelector('.order-form .choice-grid.two'), 'meat', getAllowedItems('meats'));
@@ -178,7 +169,6 @@ function renderIngredients() {
   renderChecks(chips[1], 'inside', getAllowedItems('inside'));
   renderChecks(document.querySelector('.order-form .extras-grid'), 'extra', getAllowedItems('extras'), true);
 }
-
 function renderMenu() {
   if (!menuGrid) return;
   const filtered = activeCategory === 'all' ? products : products.filter((p) => p.category === activeCategory);
@@ -200,7 +190,6 @@ function renderMenu() {
     document.querySelector('#personalizacja')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }));
 }
-
 if (categoryTabs) {
   categoryTabs.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
     activeCategory = button.dataset.category;
@@ -214,7 +203,6 @@ function getCheckedValues(name) { return Array.from(document.querySelectorAll(`i
 function getCheckedPrice(name) { return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).reduce((sum, i) => sum + Number(i.dataset.price || 0), 0); }
 function getRadioValue(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value || ''; }
 function getRadioPrice(name) { return Number(document.querySelector(`input[name="${name}"]:checked`)?.dataset.price || 0); }
-
 function updateAddressVisibility() {
   const addressBlock = document.querySelector('#addressBlock');
   const customerAddress = document.querySelector('#customerAddress');
@@ -238,6 +226,7 @@ function updateSummary() {
   const name = document.querySelector('#customerName')?.value.trim() || '';
   const phone = document.querySelector('#customerPhone')?.value.trim() || '';
   const address = document.querySelector('#customerAddress')?.value.trim() || '';
+  const paymentMethod = getPaymentSelect()?.value || 'Płatność przy odbiorze';
   const modeOption = modeSelect?.selectedOptions?.[0];
   const mode = modeOption?.value || 'Odbiór własny';
   const singlePrice = Number(product.price || 0) + getRadioPrice('size') + getRadioPrice('meat') + getCheckedPrice('extra') + Number(modeOption?.dataset.price || 0);
@@ -246,12 +235,11 @@ function updateSummary() {
   const insideText = inside.length ? inside.join(', ') : 'bez dodatków';
   const extrasText = extras.length ? extras.join(', ') : 'brak';
   summaryTitle.textContent = `${quantity}x ${product.name}`;
-  summaryDetails.innerHTML = `<strong>Klient:</strong> ${name || 'brak imienia'}${phone ? `, tel. ${phone}` : ''}<br><strong>Rozmiar:</strong> ${size || 'brak'}<br><strong>Baza:</strong> ${meat || 'brak'}<br><strong>Sos:</strong> ${sauceText}<br><strong>Dodatki:</strong> ${insideText}<br><strong>Dodatki płatne:</strong> ${extrasText}<br><strong>Odbiór:</strong> ${mode}${address ? `, ${address}` : ''}${note ? `<br><strong>Uwagi:</strong> ${note}` : ''}`;
+  summaryDetails.innerHTML = `<strong>Klient:</strong> ${name || 'brak imienia'}${phone ? `, tel. ${phone}` : ''}<br><strong>Rozmiar:</strong> ${size || 'brak'}<br><strong>Baza:</strong> ${meat || 'brak'}<br><strong>Sos:</strong> ${sauceText}<br><strong>Dodatki:</strong> ${insideText}<br><strong>Dodatki płatne:</strong> ${extrasText}<br><strong>Odbiór:</strong> ${mode}${address ? `, ${address}` : ''}<br><strong>Płatność:</strong> ${paymentMethod}${note ? `<br><strong>Uwagi:</strong> ${note}` : ''}`;
   summaryPrice.textContent = formatPrice(total);
-  lastOrderText = [`Klient: ${name || 'brak imienia'}`, `Telefon: ${phone || 'brak telefonu'}`, mode === 'Dostawa' ? `Adres: ${address || 'brak adresu'}` : null, '', `Zamówienie: ${quantity}x ${product.name}`, `Rozmiar: ${size || 'brak'}`, `Baza: ${meat || 'brak'}`, `Sos: ${sauceText}`, `Dodatki: ${insideText}`, `Dodatki płatne: ${extrasText}`, `Odbiór: ${mode}`, note ? `Uwagi: ${note}` : null, '', `Razem: ${formatPrice(total)}`].filter((line) => line !== null).join('\n');
-  lastPayload = { name, phone, address, mode, order: lastOrderText, total };
+  lastOrderText = [`Klient: ${name || 'brak imienia'}`, `Telefon: ${phone || 'brak telefonu'}`, mode === 'Dostawa' ? `Adres: ${address || 'brak adresu'}` : null, `Płatność: ${paymentMethod}`, '', `Zamówienie: ${quantity}x ${product.name}`, `Rozmiar: ${size || 'brak'}`, `Baza: ${meat || 'brak'}`, `Sos: ${sauceText}`, `Dodatki: ${insideText}`, `Dodatki płatne: ${extrasText}`, `Odbiór: ${mode}`, note ? `Uwagi: ${note}` : null, '', `Razem: ${formatPrice(total)}`].filter((line) => line !== null).join('\n');
+  lastPayload = { name, phone, address, mode, payment_method: paymentMethod, order: lastOrderText, total };
 }
-
 function validateOrder() {
   const phone = document.querySelector('#customerPhone')?.value.trim();
   const address = document.querySelector('#customerAddress')?.value.trim();
@@ -259,7 +247,6 @@ function validateOrder() {
   if (modeSelect?.value === 'Dostawa' && !address) { copyStatus.textContent = 'Przy dostawie podaj adres.'; document.querySelector('#customerAddress')?.focus(); return false; }
   return true;
 }
-
 async function sendOrderToServer() {
   updateSummary();
   if (!validateOrder()) return;
@@ -268,17 +255,18 @@ async function sendOrderToServer() {
     const response = await fetch('send-order.php', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(lastPayload) });
     const data = await response.json();
     if (!response.ok || !data.ok) throw new Error(data.error || 'Błąd wysyłki');
-    copyStatus.textContent = data.mail_sent ? `Zamówienie wysłane. Numer: ${data.order_id}` : `Zamówienie zapisane, ale mail mógł nie wyjść. Numer: ${data.order_id}`;
+    if (data.payment_url) {
+      copyStatus.innerHTML = `Zamówienie zapisane. Numer: ${data.order_id}. <a href="${data.payment_url}">Przejdź do płatności</a>`;
+    } else {
+      copyStatus.textContent = data.mail_sent ? `Zamówienie wysłane. Numer: ${data.order_id}` : `Zamówienie zapisane, ale mail mógł nie wyjść. Numer: ${data.order_id}`;
+    }
   } catch {
     copyStatus.textContent = 'Nie udało się wysłać. To działa dopiero na hostingu z PHP, nie na GitHub Pages.';
   }
 }
 
 if (orderForm) {
-  orderForm.addEventListener('change', (event) => {
-    if (event.target === productSelect) renderIngredients();
-    updateSummary();
-  });
+  orderForm.addEventListener('change', (event) => { if (event.target === productSelect) renderIngredients(); updateSummary(); });
   orderForm.addEventListener('input', updateSummary);
 }
 if (quantityInput) quantityInput.addEventListener('input', () => { if (Number(quantityInput.value) < 1) quantityInput.value = 1; updateSummary(); });
