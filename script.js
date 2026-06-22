@@ -92,6 +92,26 @@ function activeItems(items = []) {
   return items.filter((item) => item.active !== false);
 }
 
+function getProductById(id) {
+  return products.find((product) => product.id === id) || products[0] || fallbackMenu.products[0];
+}
+
+function getSelectedProduct() {
+  return getProductById(productSelect?.value);
+}
+
+function getAllowedItems(group) {
+  const product = getSelectedProduct();
+  const all = activeItems(menuData.ingredients[group] || []);
+  const allowed = product?.allowed_options?.[group];
+
+  if (!Array.isArray(allowed) || allowed.length === 0) return all;
+
+  const allowedSet = new Set(allowed.map(String));
+  const filtered = all.filter((item) => allowedSet.has(String(item.id)) || allowedSet.has(String(item.name)));
+  return filtered.length ? filtered : all;
+}
+
 async function loadMenuFromServer() {
   try {
     const response = await fetch('get-menu.php', { cache: 'no-store' });
@@ -126,10 +146,6 @@ function injectCustomerFields() {
   `);
 }
 
-function getProductById(id) {
-  return products.find((product) => product.id === id) || products[0] || fallbackMenu.products[0];
-}
-
 function renderProductOptions() {
   if (!productSelect) return;
   productSelect.innerHTML = products.map((p) => `<option value="${p.id}">${p.name} — od ${formatPrice(p.price)}</option>`).join('');
@@ -155,12 +171,12 @@ function renderChecks(container, name, items, paid = false) {
 }
 
 function renderIngredients() {
-  renderRadio(document.querySelector('[data-choice-group="size"]'), 'size', menuData.ingredients.sizes);
-  renderRadio(document.querySelector('.order-form .choice-grid.two'), 'meat', menuData.ingredients.meats);
+  renderRadio(document.querySelector('[data-choice-group="size"]'), 'size', getAllowedItems('sizes'));
+  renderRadio(document.querySelector('.order-form .choice-grid.two'), 'meat', getAllowedItems('meats'));
   const chips = document.querySelectorAll('.order-form .chips');
-  renderChecks(chips[0], 'sauce', menuData.ingredients.sauces);
-  renderChecks(chips[1], 'inside', menuData.ingredients.inside);
-  renderChecks(document.querySelector('.order-form .extras-grid'), 'extra', menuData.ingredients.extras, true);
+  renderChecks(chips[0], 'sauce', getAllowedItems('sauces'));
+  renderChecks(chips[1], 'inside', getAllowedItems('inside'));
+  renderChecks(document.querySelector('.order-form .extras-grid'), 'extra', getAllowedItems('extras'), true);
 }
 
 function renderMenu() {
@@ -179,6 +195,7 @@ function renderMenu() {
   menuGrid.querySelectorAll('img[data-fallback]').forEach((image) => image.addEventListener('error', () => image.classList.add('image-failed')));
   menuGrid.querySelectorAll('[data-select-product]').forEach((button) => button.addEventListener('click', () => {
     productSelect.value = button.dataset.selectProduct;
+    renderIngredients();
     updateSummary();
     document.querySelector('#personalizacja')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }));
@@ -210,7 +227,7 @@ function updateAddressVisibility() {
 function updateSummary() {
   if (!productSelect || !summaryTitle || !summaryDetails || !summaryPrice) return;
   updateAddressVisibility();
-  const product = getProductById(productSelect.value);
+  const product = getSelectedProduct();
   const quantity = Math.max(1, Number(quantityInput?.value || 1));
   const size = getRadioValue('size');
   const meat = getRadioValue('meat');
@@ -229,9 +246,9 @@ function updateSummary() {
   const insideText = inside.length ? inside.join(', ') : 'bez dodatków';
   const extrasText = extras.length ? extras.join(', ') : 'brak';
   summaryTitle.textContent = `${quantity}x ${product.name}`;
-  summaryDetails.innerHTML = `<strong>Klient:</strong> ${name || 'brak imienia'}${phone ? `, tel. ${phone}` : ''}<br><strong>Rozmiar:</strong> ${size}<br><strong>Baza:</strong> ${meat}<br><strong>Sos:</strong> ${sauceText}<br><strong>Dodatki:</strong> ${insideText}<br><strong>Dodatki płatne:</strong> ${extrasText}<br><strong>Odbiór:</strong> ${mode}${address ? `, ${address}` : ''}${note ? `<br><strong>Uwagi:</strong> ${note}` : ''}`;
+  summaryDetails.innerHTML = `<strong>Klient:</strong> ${name || 'brak imienia'}${phone ? `, tel. ${phone}` : ''}<br><strong>Rozmiar:</strong> ${size || 'brak'}<br><strong>Baza:</strong> ${meat || 'brak'}<br><strong>Sos:</strong> ${sauceText}<br><strong>Dodatki:</strong> ${insideText}<br><strong>Dodatki płatne:</strong> ${extrasText}<br><strong>Odbiór:</strong> ${mode}${address ? `, ${address}` : ''}${note ? `<br><strong>Uwagi:</strong> ${note}` : ''}`;
   summaryPrice.textContent = formatPrice(total);
-  lastOrderText = [`Klient: ${name || 'brak imienia'}`, `Telefon: ${phone || 'brak telefonu'}`, mode === 'Dostawa' ? `Adres: ${address || 'brak adresu'}` : null, '', `Zamówienie: ${quantity}x ${product.name}`, `Rozmiar: ${size}`, `Baza: ${meat}`, `Sos: ${sauceText}`, `Dodatki: ${insideText}`, `Dodatki płatne: ${extrasText}`, `Odbiór: ${mode}`, note ? `Uwagi: ${note}` : null, '', `Razem: ${formatPrice(total)}`].filter((line) => line !== null).join('\n');
+  lastOrderText = [`Klient: ${name || 'brak imienia'}`, `Telefon: ${phone || 'brak telefonu'}`, mode === 'Dostawa' ? `Adres: ${address || 'brak adresu'}` : null, '', `Zamówienie: ${quantity}x ${product.name}`, `Rozmiar: ${size || 'brak'}`, `Baza: ${meat || 'brak'}`, `Sos: ${sauceText}`, `Dodatki: ${insideText}`, `Dodatki płatne: ${extrasText}`, `Odbiór: ${mode}`, note ? `Uwagi: ${note}` : null, '', `Razem: ${formatPrice(total)}`].filter((line) => line !== null).join('\n');
   lastPayload = { name, phone, address, mode, order: lastOrderText, total };
 }
 
@@ -257,7 +274,13 @@ async function sendOrderToServer() {
   }
 }
 
-if (orderForm) { orderForm.addEventListener('change', updateSummary); orderForm.addEventListener('input', updateSummary); }
+if (orderForm) {
+  orderForm.addEventListener('change', (event) => {
+    if (event.target === productSelect) renderIngredients();
+    updateSummary();
+  });
+  orderForm.addEventListener('input', updateSummary);
+}
 if (quantityInput) quantityInput.addEventListener('input', () => { if (Number(quantityInput.value) < 1) quantityInput.value = 1; updateSummary(); });
 if (qtyMinus && quantityInput) qtyMinus.addEventListener('click', () => { quantityInput.value = Math.max(1, Number(quantityInput.value || 1) - 1); updateSummary(); });
 if (qtyPlus && quantityInput) qtyPlus.addEventListener('click', () => { quantityInput.value = Math.min(20, Number(quantityInput.value || 1) + 1); updateSummary(); });
