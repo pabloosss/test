@@ -6,26 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const isOpen = hour >= 10 && hour < 23;
 
   if (openStatus) {
-    openStatus.textContent = isOpen ? 'Otwarte teraz' : 'Zamknięte teraz';
-    openStatus.classList.toggle('closed', !isOpen);
+    openStatus.textContent = isOpen ? 'Otwarte teraz' : '10:00–23:00';
   }
 
   if (openStatusText) {
     openStatusText.textContent = isOpen ? 'Dzisiaj działamy do 23:00.' : 'Otwieramy codziennie od 10:00.';
-  }
-
-  const popup = document.querySelector('#todayPopup');
-  const close = document.querySelector('#todayPopupClose');
-  const wasClosed = localStorage.getItem('kebabTodayPopupClosed') === new Date().toDateString();
-
-  if (popup && !wasClosed) {
-    setTimeout(() => popup.classList.add('show'), 1600);
-  }
-
-  if (close && popup) {
-    close.addEventListener('click', () => {
-      popup.classList.remove('show');
-      localStorage.setItem('kebabTodayPopupClosed', new Date().toDateString());
-    });
   }
 });
