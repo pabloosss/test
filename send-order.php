@@ -20,6 +20,7 @@ function load_store($file, $fallback) {
 }
 
 function save_store($file, $data) {
+  if (file_exists($file) && !is_writable($file)) @chmod($file, 0666);
   $txt = "<?php\nreturn " . var_export($data, true) . ";\n";
   return file_put_contents($file, $txt, LOCK_EX) !== false;
 }
@@ -39,18 +40,31 @@ $name = clean(isset($data['name']) ? $data['name'] : '', 120);
 $phone = clean(isset($data['phone']) ? $data['phone'] : '', 80);
 $address = clean(isset($data['address']) ? $data['address'] : '', 240);
 $mode = clean(isset($data['mode']) ? $data['mode'] : 'Odbiór własny', 80);
+$paymentMethod = clean(isset($data['payment_method']) ? $data['payment_method'] : 'Płatność przy odbiorze', 120);
 $orderText = clean(isset($data['order']) ? $data['order'] : '', 5000);
 $total = (float)(isset($data['total']) ? $data['total'] : 0);
+
+$allowedPayments = array('Płatność przy odbiorze', 'Karta przy odbiorze', 'BLIK / online');
+if (!in_array($paymentMethod, $allowedPayments, true)) $paymentMethod = 'Płatność przy odbiorze';
 
 if ($phone === '') respond(400, array('ok' => false, 'error' => 'Brakuje telefonu'));
 if ($orderText === '') respond(400, array('ok' => false, 'error' => 'Brakuje zamówienia'));
 if ($mode === 'Dostawa' && $address === '') respond(400, array('ok' => false, 'error' => 'Brakuje adresu dostawy'));
+if ($total <= 0) respond(400, array('ok' => false, 'error' => 'Błędna kwota zamówienia'));
 
 $orderId = 'KK-' . date('Ymd-His') . '-' . random_int(100, 999);
+$isOnlinePayment = ($paymentMethod === 'BLIK / online');
+$paymentStatus = $isOnlinePayment ? 'oczekuje na płatność' : 'płatność przy odbiorze';
+$paymentUrl = $isOnlinePayment ? 'payment-demo.php?order=' . rawurlencode($orderId) : '';
+
 $order = array(
   'id' => $orderId,
   'created_at' => date('Y-m-d H:i:s'),
+  'updated_at' => date('Y-m-d H:i:s'),
   'status' => 'nowe',
+  'payment_method' => $paymentMethod,
+  'payment_status' => $paymentStatus,
+  'paid' => false,
   'name' => $name,
   'phone' => $phone,
   'address' => $address,
@@ -76,6 +90,8 @@ $message .= "Data: " . $order['created_at'] . "\n";
 $message .= "Klient: " . ($name ? $name : 'brak imienia') . "\n";
 $message .= "Telefon: " . $phone . "\n";
 $message .= "Odbiór: " . $mode . "\n";
+$message .= "Płatność: " . $paymentMethod . "\n";
+$message .= "Status płatności: " . $paymentStatus . "\n";
 if ($address !== '') $message .= "Adres: " . $address . "\n";
 $message .= "\nZamówienie:\n" . $orderText . "\n";
 
@@ -87,4 +103,4 @@ $headers = array(
 );
 
 $mailSent = @mail(ORDER_EMAIL, $subject, $message, implode("\r\n", $headers));
-respond(200, array('ok' => true, 'order_id' => $orderId, 'mail_sent' => $mailSent, 'history_saved' => $historySaved, 'email_to' => ORDER_EMAIL));
+respond(200, array('ok' => true, 'order_id' => $orderId, 'mail_sent' => $mailSent, 'history_saved' => $historySaved, 'payment_method' => $paymentMethod, 'payment_status' => $paymentStatus, 'payment_url' => $paymentUrl, 'email_to' => ORDER_EMAIL));
