@@ -1,236 +1,90 @@
 <?php
-if (isset($_GET['debug'])) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-}
-
+if (isset($_GET['debug'])) { ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL); }
 require __DIR__ . '/app-config.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    @session_start();
-}
+if (session_status() === PHP_SESSION_NONE) { @session_start(); }
 
 $MENU_STORE = __DIR__ . '/menu-data.php';
 $ORDERS_STORE = __DIR__ . '/orders-data.php';
-$UPLOAD_DIR = __DIR__ . '/uploads/products';
-$UPLOAD_URL = 'uploads/products';
 $AUTH_COOKIE = 'kk_admin_auth';
+$categories = array('lawasz','box','talerz','grill','vege','dodatki');
+$groups = array('sizes'=>'Rozmiary','meats'=>'Mięsa / baza','sauces'=>'Sosy','inside'=>'Dodatki w środku','extras'=>'Dodatki płatne');
+$statusList = array('nowe','przyjęte','w realizacji','gotowe','odebrane','anulowane');
 
-$categories = array('lawasz', 'box', 'talerz', 'grill', 'vege', 'dodatki');
-$groups = array(
-    'sizes' => 'Rozmiary',
-    'meats' => 'Mięsa / baza',
-    'sauces' => 'Sosy',
-    'inside' => 'Dodatki w środku',
-    'extras' => 'Dodatki płatne'
-);
-$statusList = array('nowe', 'przyjęte', 'w realizacji', 'gotowe', 'odebrane', 'anulowane');
+function e($v){ return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
+function txt($v,$l=1000){ $v=strip_tags(trim((string)$v)); $v=str_replace(array("\0","\r"),'',$v); return function_exists('mb_substr') ? mb_substr($v,0,$l,'UTF-8') : substr($v,0,$l); }
+function slugv($v){ if(function_exists('iconv')){ $x=@iconv('UTF-8','ASCII//TRANSLIT',$v); if($x!==false)$v=$x; } $v=strtolower(preg_replace('/[^a-zA-Z0-9]+/','-',$v)); $v=trim($v,'-'); return $v?$v:'item'; }
+function money($v){ return number_format((float)$v,2,',',' ').' zł'; }
+function default_menu(){ return array('products'=>array(),'ingredients'=>array('sizes'=>array(),'meats'=>array(),'sauces'=>array(),'inside'=>array(),'extras'=>array())); }
+function auth_token(){ return hash_hmac('sha256', ADMIN_USER.'|'.ADMIN_PASSWORD_HASH, ADMIN_PASSWORD_HASH); }
+function okpass($u,$p){ return $u===ADMIN_USER && hash_equals(ADMIN_PASSWORD_HASH, hash('sha256',(string)$p)); }
+function logged(){ global $AUTH_COOKIE; if(!empty($_SESSION['admin_logged'])) return true; if(!empty($_COOKIE[$AUTH_COOKIE]) && hash_equals(auth_token(), $_COOKIE[$AUTH_COOKIE])){ $_SESSION['admin_logged']=true; return true; } return false; }
+function login_now(){ global $AUTH_COOKIE; $_SESSION['admin_logged']=true; setcookie($AUTH_COOKIE, auth_token(), time()+1209600, '/'); $_COOKIE[$AUTH_COOKIE]=auth_token(); }
+function logout_now(){ global $AUTH_COOKIE; $_SESSION=array(); if(session_status()===PHP_SESSION_ACTIVE) @session_destroy(); setcookie($AUTH_COOKIE,'',time()-3600,'/'); unset($_COOKIE[$AUTH_COOKIE]); }
+function go($p=''){ $u='admin.php'; if($p!=='')$u.='?'.$p; header('Location: '.$u); exit; }
+function load_store($file,$fallback){ if(file_exists($file)){ $data=include $file; if(is_array($data)) return $data; } return $fallback; }
+function save_store($file,$data,&$err){ $content="<?php\nreturn ".var_export($data,true).";\n"; if(file_exists($file)&&!is_writable($file)) @chmod($file,0666); if(!file_exists($file)&&!is_writable(dirname($file))){ $err='Brak zapisu w katalogu strony.'; return false; } if(file_exists($file)&&!is_writable($file)){ $err='Brak zapisu do '.basename($file).'. Ustaw 664 albo 666.'; return false; } if(@file_put_contents($file,$content,LOCK_EX)===false){ $err='Nie udało się zapisać '.basename($file).'.'; return false; } return true; }
+function norm_menu($menu,$groups){ if(!isset($menu['products'])||!is_array($menu['products']))$menu['products']=array(); if(!isset($menu['ingredients'])||!is_array($menu['ingredients']))$menu['ingredients']=default_menu()['ingredients']; foreach($groups as $k=>$v){ if(!isset($menu['ingredients'][$k])||!is_array($menu['ingredients'][$k]))$menu['ingredients'][$k]=array(); } return $menu; }
+function clean_img($v,&$err){ $v=trim((string)$v); if($v==='')return ''; if(strlen($v)>900000){ $err='Zdjęcie jest za duże. Wybierz mniejsze, najlepiej do 600 KB.'; return false; } if(strpos($v,'data:image/')===0){ if(!preg_match('/^data:image\/(jpeg|png|webp|gif);base64,[a-zA-Z0-9+\/]+=*$/',$v)){ $err='Nieprawidłowe zdjęcie.'; return false; } return $v; } return txt($v,1000); }
 
-function e($value) { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
-function text_value($value, $limit = 1000) { $value = strip_tags(trim((string)$value)); $value = str_replace(array("\0", "\r"), '', $value); return function_exists('mb_substr') ? mb_substr($value, 0, $limit, 'UTF-8') : substr($value, 0, $limit); }
-function slug_value($value) { if (function_exists('iconv')) { $converted = @iconv('UTF-8', 'ASCII//TRANSLIT', $value); if ($converted !== false) $value = $converted; } $value = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $value)); $value = trim($value, '-'); return $value !== '' ? $value : 'item'; }
-function money($value) { return number_format((float)$value, 2, ',', ' ') . ' zł'; }
-function default_menu() { return array('products' => array(), 'ingredients' => array('sizes' => array(), 'meats' => array(), 'sauces' => array(), 'inside' => array(), 'extras' => array())); }
-function auth_token() { return hash_hmac('sha256', ADMIN_USER . '|' . ADMIN_PASSWORD_HASH, ADMIN_PASSWORD_HASH); }
-function password_ok($user, $password) { return $user === ADMIN_USER && hash_equals(ADMIN_PASSWORD_HASH, hash('sha256', (string)$password)); }
+if(isset($_GET['logout'])){ logout_now(); go('ok=logout'); }
+$notice=''; $error='';
+$msg=array('login'=>'Zalogowano.','logout'=>'Wylogowano.','product_saved'=>'Produkt zapisany.','product_deleted'=>'Produkt usunięty.','ingredient_saved'=>'Składnik zapisany.','ingredient_deleted'=>'Składnik usunięty.','status_saved'=>'Status zmieniony.');
+if(isset($_GET['ok']) && isset($msg[$_GET['ok']])) $notice=$msg[$_GET['ok']];
+$menu=norm_menu(load_store($MENU_STORE,default_menu()),$groups);
+$orders=load_store($ORDERS_STORE,array('orders'=>array())); if(!isset($orders['orders'])||!is_array($orders['orders']))$orders['orders']=array();
 
-function admin_is_logged() {
-    global $AUTH_COOKIE;
-    if (!empty($_SESSION['admin_logged'])) return true;
-    if (!empty($_COOKIE[$AUTH_COOKIE]) && hash_equals(auth_token(), $_COOKIE[$AUTH_COOKIE])) { $_SESSION['admin_logged'] = true; return true; }
-    return false;
+if($_SERVER['REQUEST_METHOD']==='POST'){
+  $action=isset($_POST['action'])?$_POST['action']:'';
+  if($action==='login'){
+    $u=txt(isset($_POST['username'])?$_POST['username']:'',80); $p=isset($_POST['password'])?$_POST['password']:'';
+    if(okpass($u,$p)){ login_now(); go('ok=login'); }
+    $error='Błędny login albo hasło.';
+  }
+  if($action!=='login' && !logged()) $error='Sesja wygasła. Zaloguj się ponownie.';
+
+  if(logged() && $action==='save_product'){
+    $id=txt(isset($_POST['id'])?$_POST['id']:'',120); $name=txt(isset($_POST['name'])?$_POST['name']:'',160);
+    if($name==='') $error='Podaj nazwę produktu.';
+    else{
+      if($id==='') $id=slugv($name).'-'.substr(md5(uniqid('',true)),0,5);
+      $imgData=isset($_POST['image_data'])?$_POST['image_data']:''; $manual=isset($_POST['image'])?$_POST['image']:''; $current=isset($_POST['current_image'])?$_POST['current_image']:'';
+      $imgSource=$imgData!==''?$imgData:($manual!==''?$manual:$current);
+      $img=clean_img($imgSource,$error);
+      if($img!==false){
+        $p=array('id'=>$id,'name'=>$name,'category'=>txt(isset($_POST['category'])?$_POST['category']:'lawasz',80),'badge'=>txt(isset($_POST['badge'])?$_POST['badge']:'Menu',80),'price'=>(float)(isset($_POST['price'])?$_POST['price']:0),'description'=>txt(isset($_POST['description'])?$_POST['description']:'',600),'image'=>$img,'active'=>!empty($_POST['active']));
+        $found=false; for($i=0;$i<count($menu['products']);$i++){ if(isset($menu['products'][$i]['id'])&&$menu['products'][$i]['id']===$id){ $menu['products'][$i]=$p; $found=true; break; }} if(!$found)$menu['products'][]=$p;
+        if(save_store($MENU_STORE,$menu,$error))go('ok=product_saved');
+      }
+    }
+  }
+  if(logged() && $action==='delete_product'){
+    $id=txt(isset($_POST['id'])?$_POST['id']:'',120); $new=array(); foreach($menu['products'] as $p){ if(!isset($p['id'])||$p['id']!==$id)$new[]=$p; } $menu['products']=$new; if(save_store($MENU_STORE,$menu,$error))go('ok=product_deleted');
+  }
+  if(logged() && $action==='save_ingredient'){
+    $g=txt(isset($_POST['group'])?$_POST['group']:'extras',80); $name=txt(isset($_POST['name'])?$_POST['name']:'',160);
+    if(!isset($groups[$g]))$error='Zła grupa.'; elseif($name==='')$error='Podaj nazwę.'; else{ $id=txt(isset($_POST['id'])?$_POST['id']:'',120); if($id==='')$id=slugv($name).'-'.substr(md5(uniqid('',true)),0,5); $x=array('id'=>$id,'name'=>$name,'label'=>txt(isset($_POST['label'])&&$_POST['label']!==''?$_POST['label']:$name,160),'price'=>(float)(isset($_POST['price'])?$_POST['price']:0),'default'=>!empty($_POST['default']),'active'=>!empty($_POST['active'])); $found=false; for($i=0;$i<count($menu['ingredients'][$g]);$i++){ if(isset($menu['ingredients'][$g][$i]['id'])&&$menu['ingredients'][$g][$i]['id']===$id){ $menu['ingredients'][$g][$i]=$x; $found=true; break; }} if(!$found)$menu['ingredients'][$g][]=$x; if(save_store($MENU_STORE,$menu,$error))go('ok=ingredient_saved'); }
+  }
+  if(logged() && $action==='delete_ingredient'){
+    $g=txt(isset($_POST['group'])?$_POST['group']:'',80); $id=txt(isset($_POST['id'])?$_POST['id']:'',120); if(isset($menu['ingredients'][$g])){ $new=array(); foreach($menu['ingredients'][$g] as $x){ if(!isset($x['id'])||$x['id']!==$id)$new[]=$x; } $menu['ingredients'][$g]=$new; } if(save_store($MENU_STORE,$menu,$error))go('ok=ingredient_deleted');
+  }
+  if(logged() && $action==='order_status'){
+    $id=txt(isset($_POST['id'])?$_POST['id']:'',120); $st=txt(isset($_POST['status'])?$_POST['status']:'nowe',80); for($i=0;$i<count($orders['orders']);$i++){ if(isset($orders['orders'][$i]['id'])&&$orders['orders'][$i]['id']===$id){ $orders['orders'][$i]['status']=$st; $orders['orders'][$i]['updated_at']=date('Y-m-d H:i:s'); break; }} if(save_store($ORDERS_STORE,$orders,$error))go('ok=status_saved');
+  }
 }
 
-function admin_login() { global $AUTH_COOKIE; $_SESSION['admin_logged'] = true; setcookie($AUTH_COOKIE, auth_token(), time() + 60 * 60 * 24 * 14, '/'); $_COOKIE[$AUTH_COOKIE] = auth_token(); }
-function admin_logout() { global $AUTH_COOKIE; $_SESSION = array(); if (session_status() === PHP_SESSION_ACTIVE) @session_destroy(); setcookie($AUTH_COOKIE, '', time() - 3600, '/'); unset($_COOKIE[$AUTH_COOKIE]); }
-function redirect_admin($params = '') { $url = 'admin.php'; if ($params !== '') $url .= '?' . $params; header('Location: ' . $url); exit; }
-function load_store($file, $fallback) { if (file_exists($file)) { $data = include $file; if (is_array($data)) return $data; } return $fallback; }
-
-function save_store($file, $data, &$error) {
-    $content = "<?php\nreturn " . var_export($data, true) . ";\n";
-    if (file_exists($file) && !is_writable($file)) @chmod($file, 0666);
-    if (!file_exists($file) && !is_writable(dirname($file))) { $error = 'Brak zapisu w katalogu strony. Hosting blokuje tworzenie plików.'; return false; }
-    if (file_exists($file) && !is_writable($file)) { $error = 'Brak zapisu do pliku: ' . basename($file) . '. Ustaw uprawnienia pliku na 664 albo 666.'; return false; }
-    if (@file_put_contents($file, $content, LOCK_EX) === false) { $error = 'Nie udało się zapisać pliku: ' . basename($file) . '.'; return false; }
-    return true;
-}
-
-function normalize_menu($menu, $groups) {
-    if (!isset($menu['products']) || !is_array($menu['products'])) $menu['products'] = array();
-    if (!isset($menu['ingredients']) || !is_array($menu['ingredients'])) $menu['ingredients'] = default_menu()['ingredients'];
-    foreach ($groups as $key => $label) if (!isset($menu['ingredients'][$key]) || !is_array($menu['ingredients'][$key])) $menu['ingredients'][$key] = array();
-    return $menu;
-}
-
-function product_upload_error_text($code) {
-    $messages = array(
-        UPLOAD_ERR_INI_SIZE => 'Plik jest za duży dla ustawień hostingu.',
-        UPLOAD_ERR_FORM_SIZE => 'Plik jest za duży.',
-        UPLOAD_ERR_PARTIAL => 'Plik wgrał się tylko częściowo.',
-        UPLOAD_ERR_NO_FILE => '',
-        UPLOAD_ERR_NO_TMP_DIR => 'Hosting nie ma folderu tymczasowego dla uploadu.',
-        UPLOAD_ERR_CANT_WRITE => 'Hosting nie pozwolił zapisać pliku.',
-        UPLOAD_ERR_EXTENSION => 'Upload został zablokowany przez rozszerzenie PHP.'
-    );
-    return isset($messages[$code]) ? $messages[$code] : 'Nieznany błąd uploadu.';
-}
-
-function handle_product_image_upload($productName, $currentImage, &$error) {
-    global $UPLOAD_DIR, $UPLOAD_URL;
-
-    if (empty($_FILES['image_file']) || !isset($_FILES['image_file']['error'])) return $currentImage;
-    if ($_FILES['image_file']['error'] === UPLOAD_ERR_NO_FILE) return $currentImage;
-    if ($_FILES['image_file']['error'] !== UPLOAD_ERR_OK) { $error = product_upload_error_text($_FILES['image_file']['error']); return false; }
-    if (!is_uploaded_file($_FILES['image_file']['tmp_name'])) { $error = 'Nieprawidłowy upload pliku.'; return false; }
-    if ($_FILES['image_file']['size'] > 4 * 1024 * 1024) { $error = 'Zdjęcie jest za duże. Maksymalnie 4 MB.'; return false; }
-
-    $imageInfo = @getimagesize($_FILES['image_file']['tmp_name']);
-    if ($imageInfo === false || empty($imageInfo['mime'])) { $error = 'To nie wygląda jak prawdziwe zdjęcie.'; return false; }
-
-    $allowed = array('image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif');
-    if (!isset($allowed[$imageInfo['mime']])) { $error = 'Dozwolone są tylko JPG, PNG, WEBP albo GIF.'; return false; }
-
-    if (!is_dir($UPLOAD_DIR)) @mkdir($UPLOAD_DIR, 0755, true);
-    if (!is_dir($UPLOAD_DIR) || !is_writable($UPLOAD_DIR)) { $error = 'Folder uploads/products nie ma prawa zapisu. Ustaw 755 albo 775.'; return false; }
-
-    $base = slug_value($productName);
-    $fileName = $base . '-' . date('YmdHis') . '-' . random_int(100, 999) . '.' . $allowed[$imageInfo['mime']];
-    $target = $UPLOAD_DIR . '/' . $fileName;
-
-    if (!move_uploaded_file($_FILES['image_file']['tmp_name'], $target)) { $error = 'Nie udało się przenieść zdjęcia do uploads/products.'; return false; }
-    @chmod($target, 0644);
-
-    return $UPLOAD_URL . '/' . $fileName;
-}
-
-if (isset($_GET['logout'])) { admin_logout(); redirect_admin('ok=logout'); }
-
-$notice = '';
-$error = '';
-$messages = array('login' => 'Zalogowano. Panel jest aktywny.', 'logout' => 'Wylogowano.', 'product_saved' => 'Produkt zapisany. Odśwież stronę główną, żeby zobaczyć zmianę.', 'product_deleted' => 'Produkt usunięty.', 'ingredient_saved' => 'Składnik zapisany.', 'ingredient_deleted' => 'Składnik usunięty.', 'status_saved' => 'Status zamówienia zmieniony.');
-if (isset($_GET['ok']) && isset($messages[$_GET['ok']])) $notice = $messages[$_GET['ok']];
-
-$menu = normalize_menu(load_store($MENU_STORE, default_menu()), $groups);
-$orders = load_store($ORDERS_STORE, array('orders' => array()));
-if (!isset($orders['orders']) || !is_array($orders['orders'])) $orders['orders'] = array();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = isset($_POST['action']) ? $_POST['action'] : '';
-
-    if ($action === 'login') {
-        $user = text_value(isset($_POST['username']) ? $_POST['username'] : '', 80);
-        $password = isset($_POST['password']) ? $_POST['password'] : '';
-        if (password_ok($user, $password)) { admin_login(); redirect_admin('ok=login'); }
-        $error = 'Błędny login albo hasło.';
-    }
-
-    if ($action !== 'login' && !admin_is_logged()) $error = 'Sesja wygasła. Zaloguj się ponownie.';
-
-    if (admin_is_logged() && $action === 'save_product') {
-        $id = text_value(isset($_POST['id']) ? $_POST['id'] : '', 120);
-        $name = text_value(isset($_POST['name']) ? $_POST['name'] : '', 160);
-        if ($name === '') $error = 'Podaj nazwę produktu.';
-        else {
-            if ($id === '') $id = slug_value($name) . '-' . substr(md5(uniqid('', true)), 0, 5);
-            $manualImage = text_value(isset($_POST['image']) ? $_POST['image'] : '', 1000);
-            $currentImage = text_value(isset($_POST['current_image']) ? $_POST['current_image'] : '', 1000);
-            $finalImage = $manualImage !== '' ? $manualImage : $currentImage;
-            $uploadedImage = handle_product_image_upload($name, $finalImage, $error);
-            if ($uploadedImage !== false) {
-                $finalImage = $uploadedImage;
-                $product = array('id' => $id, 'name' => $name, 'category' => text_value(isset($_POST['category']) ? $_POST['category'] : 'lawasz', 80), 'badge' => text_value(isset($_POST['badge']) ? $_POST['badge'] : 'Menu', 80), 'price' => (float)(isset($_POST['price']) ? $_POST['price'] : 0), 'description' => text_value(isset($_POST['description']) ? $_POST['description'] : '', 600), 'image' => $finalImage, 'active' => !empty($_POST['active']));
-                $found = false;
-                for ($i = 0; $i < count($menu['products']); $i++) { if (isset($menu['products'][$i]['id']) && $menu['products'][$i]['id'] === $id) { $menu['products'][$i] = $product; $found = true; break; } }
-                if (!$found) $menu['products'][] = $product;
-                if (save_store($MENU_STORE, $menu, $error)) redirect_admin('ok=product_saved');
-            }
-        }
-    }
-
-    if (admin_is_logged() && $action === 'delete_product') {
-        $id = text_value(isset($_POST['id']) ? $_POST['id'] : '', 120);
-        $newProducts = array();
-        foreach ($menu['products'] as $product) if (!isset($product['id']) || $product['id'] !== $id) $newProducts[] = $product;
-        $menu['products'] = $newProducts;
-        if (save_store($MENU_STORE, $menu, $error)) redirect_admin('ok=product_deleted');
-    }
-
-    if (admin_is_logged() && $action === 'save_ingredient') {
-        $group = text_value(isset($_POST['group']) ? $_POST['group'] : 'extras', 80);
-        $name = text_value(isset($_POST['name']) ? $_POST['name'] : '', 160);
-        if (!isset($groups[$group])) $error = 'Nieprawidłowa grupa składnika.';
-        elseif ($name === '') $error = 'Podaj nazwę składnika.';
-        else {
-            $id = text_value(isset($_POST['id']) ? $_POST['id'] : '', 120);
-            if ($id === '') $id = slug_value($name) . '-' . substr(md5(uniqid('', true)), 0, 5);
-            $ingredient = array('id' => $id, 'name' => $name, 'label' => text_value(isset($_POST['label']) && $_POST['label'] !== '' ? $_POST['label'] : $name, 160), 'price' => (float)(isset($_POST['price']) ? $_POST['price'] : 0), 'default' => !empty($_POST['default']), 'active' => !empty($_POST['active']));
-            $found = false;
-            for ($i = 0; $i < count($menu['ingredients'][$group]); $i++) { if (isset($menu['ingredients'][$group][$i]['id']) && $menu['ingredients'][$group][$i]['id'] === $id) { $menu['ingredients'][$group][$i] = $ingredient; $found = true; break; } }
-            if (!$found) $menu['ingredients'][$group][] = $ingredient;
-            if (save_store($MENU_STORE, $menu, $error)) redirect_admin('ok=ingredient_saved');
-        }
-    }
-
-    if (admin_is_logged() && $action === 'delete_ingredient') {
-        $group = text_value(isset($_POST['group']) ? $_POST['group'] : '', 80);
-        $id = text_value(isset($_POST['id']) ? $_POST['id'] : '', 120);
-        if (isset($menu['ingredients'][$group])) { $newItems = array(); foreach ($menu['ingredients'][$group] as $item) if (!isset($item['id']) || $item['id'] !== $id) $newItems[] = $item; $menu['ingredients'][$group] = $newItems; }
-        if (save_store($MENU_STORE, $menu, $error)) redirect_admin('ok=ingredient_deleted');
-    }
-
-    if (admin_is_logged() && $action === 'order_status') {
-        $id = text_value(isset($_POST['id']) ? $_POST['id'] : '', 120);
-        $status = text_value(isset($_POST['status']) ? $_POST['status'] : 'nowe', 80);
-        for ($i = 0; $i < count($orders['orders']); $i++) if (isset($orders['orders'][$i]['id']) && $orders['orders'][$i]['id'] === $id) { $orders['orders'][$i]['status'] = $status; $orders['orders'][$i]['updated_at'] = date('Y-m-d H:i:s'); break; }
-        if (save_store($ORDERS_STORE, $orders, $error)) redirect_admin('ok=status_saved');
-    }
-}
-
-$menu = normalize_menu(load_store($MENU_STORE, $menu), $groups);
-$orders = load_store($ORDERS_STORE, $orders);
-if (!isset($orders['orders']) || !is_array($orders['orders'])) $orders['orders'] = array();
-
-$editProduct = null;
-if (admin_is_logged() && isset($_GET['edit_product'])) foreach ($menu['products'] as $product) if (isset($product['id']) && $product['id'] === $_GET['edit_product']) { $editProduct = $product; break; }
-$editIngredient = null;
-$editGroup = isset($_GET['group']) ? $_GET['group'] : 'extras';
-if (admin_is_logged() && isset($_GET['edit_ingredient'], $_GET['group']) && isset($menu['ingredients'][$_GET['group']])) foreach ($menu['ingredients'][$_GET['group']] as $ingredientItem) if (isset($ingredientItem['id']) && $ingredientItem['id'] === $_GET['edit_ingredient']) { $editIngredient = $ingredientItem; $editGroup = $_GET['group']; break; }
-
-$menuWritable = is_writable($MENU_STORE) || (!file_exists($MENU_STORE) && is_writable(__DIR__));
-$ordersWritable = is_writable($ORDERS_STORE) || (!file_exists($ORDERS_STORE) && is_writable(__DIR__));
-$uploadsWritable = is_dir($UPLOAD_DIR) ? is_writable($UPLOAD_DIR) : is_writable(__DIR__);
+$menu=norm_menu(load_store($MENU_STORE,$menu),$groups); $orders=load_store($ORDERS_STORE,$orders); if(!isset($orders['orders'])||!is_array($orders['orders']))$orders['orders']=array();
+$editP=null; if(logged() && isset($_GET['edit_product']))foreach($menu['products'] as $p){ if(isset($p['id'])&&$p['id']===$_GET['edit_product']){ $editP=$p; break; }}
+$editI=null; $editG=isset($_GET['group'])?$_GET['group']:'extras'; if(logged() && isset($_GET['edit_ingredient'],$_GET['group']) && isset($menu['ingredients'][$_GET['group']]))foreach($menu['ingredients'][$_GET['group']] as $x){ if(isset($x['id'])&&$x['id']===$_GET['edit_ingredient']){ $editI=$x; $editG=$_GET['group']; break; }}
+$menuWritable=is_writable($MENU_STORE)||(!file_exists($MENU_STORE)&&is_writable(__DIR__)); $ordersWritable=is_writable($ORDERS_STORE)||(!file_exists($ORDERS_STORE)&&is_writable(__DIR__));
 ?>
-<!doctype html>
-<html lang="pl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin KebabKing</title>
-<style>
-body{margin:0;font-family:Arial,sans-serif;background:#fff6df;color:#20130d}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{background:#fff;border-bottom:1px solid #eadfcd}.top .wrap{min-height:72px;display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-size:24px;font-weight:900;color:#d71920;text-decoration:none}.btn,button{border:0;border-radius:999px;padding:10px 14px;background:#ffbc0d;font-weight:900;color:#20130d;text-decoration:none;cursor:pointer;display:inline-block}.dark{background:#20130d;color:#fff}.danger{background:#ffe0e0;color:#a81017}.main{padding:30px 0 80px}.card{background:#fff;border:1px solid #eadfcd;border-radius:22px;padding:20px;margin:0 0 18px;box-shadow:0 14px 36px #0001}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.wide{grid-column:span 2}label{display:grid;gap:6px;font-weight:800;color:#715f53}input,select,textarea{width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:12px;padding:11px}.check{display:flex;gap:8px;align-items:center}.check input{width:auto}.msg{padding:12px 16px;border-radius:16px;margin-bottom:14px;font-weight:900}.ok{background:#e8f8ee;color:#208a3a}.err{background:#ffe0e0;color:#a81017}.warn{background:#fff0c2}.scroll{overflow:auto}table{width:100%;min-width:760px;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}.order{display:grid;grid-template-columns:1fr 180px;gap:12px;border:1px solid #eee;border-radius:16px;padding:14px;margin:10px 0}.order pre{white-space:pre-wrap;background:#f5ead6;padding:12px;border-radius:12px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}.preview{width:86px;height:64px;object-fit:cover;border-radius:12px;background:#f5ead6}.hint{font-size:.86rem;color:#715f53;font-weight:700}@media(max-width:850px){.grid,.order{grid-template-columns:1fr}.wide{grid-column:span 1}}</style>
-</head>
-<body>
-<header class="top"><div class="wrap"><a class="logo" href="index.html">KebabKing</a><nav><a class="btn dark" href="index.html">Strona</a> <?php if(admin_is_logged()): ?><a class="btn" href="admin.php?logout=1">Wyloguj</a><?php endif; ?></nav></div></header>
-<main class="wrap main">
-<?php if($notice): ?><div class="msg ok"><?=e($notice)?></div><?php endif; ?>
-<?php if($error): ?><div class="msg err"><?=e($error)?></div><?php endif; ?>
-
-<?php if(!admin_is_logged()): ?>
-<section class="card"><h1>Logowanie admina</h1><form method="post" action="admin.php"><input type="hidden" name="action" value="login"><p><label>Login<input name="username" value="admin"></label></p><p><label>Hasło<input type="password" name="password"></label></p><button type="submit">Zaloguj</button></form></section>
-<section class="card"><h2>Test zapisu</h2><p class="msg <?= $menuWritable ? 'ok' : 'err' ?>">menu-data.php: <?= $menuWritable ? 'zapis OK' : 'BRAK ZAPISU' ?></p><p class="msg <?= $ordersWritable ? 'ok' : 'err' ?>">orders-data.php: <?= $ordersWritable ? 'zapis OK' : 'BRAK ZAPISU' ?></p><p class="msg <?= $uploadsWritable ? 'ok' : 'err' ?>">uploads/products: <?= $uploadsWritable ? 'upload OK' : 'BRAK ZAPISU DLA ZDJĘĆ' ?></p></section>
-<?php else: ?>
-<h1>Panel admina</h1>
-<div class="toolbar"><a class="btn" href="admin.php">Dodaj nowy produkt</a><a class="btn" href="#ingredients">Składniki</a><a class="btn" href="#orders">Zamówienia</a></div>
-<?php if(!$menuWritable): ?><div class="msg err">Brak zapisu do menu-data.php. Ustaw uprawnienia pliku na 664 albo 666.</div><?php endif; ?>
-<?php if(!$uploadsWritable): ?><div class="msg err">Brak zapisu do uploads/products. Ustaw folder na 755 albo 775.</div><?php endif; ?>
-
-<section class="card"><h2><?= $editProduct ? 'Edytuj produkt' : 'Dodaj produkt' ?></h2><form method="post" action="admin.php" class="grid" enctype="multipart/form-data"><input type="hidden" name="action" value="save_product"><input type="hidden" name="id" value="<?=e($editProduct['id'] ?? '')?>"><input type="hidden" name="current_image" value="<?=e($editProduct['image'] ?? '')?>"><input type="hidden" name="MAX_FILE_SIZE" value="4194304"><label>Nazwa<input name="name" value="<?=e($editProduct['name'] ?? '')?>" required></label><label>Kategoria<select name="category"><?php foreach($categories as $category): ?><option value="<?=$category?>" <?=($editProduct['category'] ?? '')===$category?'selected':''?>><?=$category?></option><?php endforeach; ?></select></label><label>Cena<input type="number" step="0.01" name="price" value="<?=e($editProduct['price'] ?? '')?>" required></label><label>Etykieta<input name="badge" value="<?=e($editProduct['badge'] ?? '')?>"></label><label class="wide">Wgraj zdjęcie<input type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif"><span class="hint">JPG, PNG, WEBP albo GIF. Maksymalnie 4 MB.</span></label><label class="wide">Albo link do zdjęcia<input name="image" value="<?=e($editProduct['image'] ?? '')?>" placeholder="https://... albo uploads/products/plik.jpg"><span class="hint">Jeśli wgrasz plik, nadpisze link.</span></label><label class="wide">Opis<textarea name="description" rows="3"><?=e($editProduct['description'] ?? '')?></textarea></label><label class="check"><input type="checkbox" name="active" <?=($editProduct['active'] ?? true)?'checked':''?>> aktywny</label><button type="submit">Zapisz produkt</button></form><?php if(!empty($editProduct['image'])): ?><p><img class="preview" src="<?=e($editProduct['image'])?>" alt="Podgląd"> <span class="hint">Aktualne zdjęcie</span></p><?php endif; ?></section>
-
-<section class="card"><h2>Produkty</h2><div class="scroll"><table><tr><th>Zdjęcie</th><th>Nazwa</th><th>Kategoria</th><th>Cena</th><th>Status</th><th>Akcje</th></tr><?php foreach($menu['products'] as $product): ?><tr><td><?php if(!empty($product['image'])): ?><img class="preview" src="<?=e($product['image'])?>" alt=""></td><?php else: ?>—</td><?php endif; ?><td><b><?=e($product['name'])?></b><br><small><?=e($product['badge'] ?? '')?></small></td><td><?=e($product['category'])?></td><td><?=money($product['price'])?></td><td><?=!empty($product['active'])?'aktywny':'ukryty'?></td><td><a class="btn" href="admin.php?edit_product=<?=e($product['id'])?>">Edytuj</a> <form method="post" action="admin.php" style="display:inline" onsubmit="return confirm('Usunąć produkt?')"><input type="hidden" name="action" value="delete_product"><input type="hidden" name="id" value="<?=e($product['id'])?>"><button class="danger" type="submit">Usuń</button></form></td></tr><?php endforeach; ?></table></div></section>
-
-<section class="card" id="ingredients"><h2><?= $editIngredient ? 'Edytuj składnik' : 'Dodaj składnik' ?></h2><form method="post" action="admin.php" class="grid"><input type="hidden" name="action" value="save_ingredient"><input type="hidden" name="id" value="<?=e($editIngredient['id'] ?? '')?>"><label>Grupa<select name="group"><?php foreach($groups as $groupKey=>$groupLabel): ?><option value="<?=$groupKey?>" <?=$editGroup===$groupKey?'selected':''?>><?=$groupLabel?></option><?php endforeach; ?></select></label><label>Nazwa<input name="name" value="<?=e($editIngredient['name'] ?? '')?>" required></label><label>Etykieta<input name="label" value="<?=e($editIngredient['label'] ?? '')?>"></label><label>Dopłata<input type="number" step="0.01" name="price" value="<?=e($editIngredient['price'] ?? 0)?>"></label><label class="check"><input type="checkbox" name="default" <?=!empty($editIngredient['default'])?'checked':''?>> domyślne</label><label class="check"><input type="checkbox" name="active" <?=($editIngredient['active'] ?? true)?'checked':''?>> aktywne</label><button type="submit">Zapisz składnik</button></form></section>
-<section class="card"><h2>Składniki</h2><div class="scroll"><table><tr><th>Grupa</th><th>Nazwa</th><th>Dopłata</th><th>Status</th><th>Akcje</th></tr><?php foreach($groups as $groupKey=>$groupLabel): foreach(($menu['ingredients'][$groupKey] ?? array()) as $item): ?><tr><td><?=e($groupLabel)?></td><td><b><?=e($item['label'] ?? $item['name'])?></b><br><small><?=e($item['name'])?></small></td><td><?=money($item['price'] ?? 0)?></td><td><?=!empty($item['active'])?'aktywny':'ukryty'?><?=!empty($item['default'])?'<br><small>domyślne</small>':''?></td><td><a class="btn" href="admin.php?group=<?=e($groupKey)?>&edit_ingredient=<?=e($item['id'])?>#ingredients">Edytuj</a> <form method="post" action="admin.php" style="display:inline" onsubmit="return confirm('Usunąć składnik?')"><input type="hidden" name="action" value="delete_ingredient"><input type="hidden" name="group" value="<?=e($groupKey)?>"><input type="hidden" name="id" value="<?=e($item['id'])?>"><button class="danger" type="submit">Usuń</button></form></td></tr><?php endforeach; endforeach; ?></table></div></section>
-<section class="card" id="orders"><h2>Zamówienia</h2><?php if(empty($orders['orders'])): ?><p>Brak zamówień.</p><?php endif; ?><?php foreach(($orders['orders'] ?? array()) as $order): ?><article class="order"><div><h3><?=e($order['id'])?></h3><p><b><?=e($order['name'] ?: 'brak imienia')?></b> · tel. <?=e($order['phone'])?> · <?=e($order['created_at'])?> · <?=money($order['total'])?></p><pre><?=e($order['order_text'])?></pre></div><form method="post" action="admin.php"><input type="hidden" name="action" value="order_status"><input type="hidden" name="id" value="<?=e($order['id'])?>"><label>Status<select name="status" onchange="this.form.submit()"><?php foreach($statusList as $status): ?><option value="<?=$status?>" <?=($order['status'] ?? '')===$status?'selected':''?>><?=$status?></option><?php endforeach; ?></select></label></form></article><?php endforeach; ?></section>
-<?php endif; ?>
-</main></body></html>
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin KebabKing</title><style>body{margin:0;font-family:Arial,sans-serif;background:#fff6df;color:#20130d}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{background:#fff;border-bottom:1px solid #eadfcd}.top .wrap{min-height:72px;display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-size:24px;font-weight:900;color:#d71920;text-decoration:none}.btn,button{border:0;border-radius:999px;padding:10px 14px;background:#ffbc0d;font-weight:900;color:#20130d;text-decoration:none;cursor:pointer;display:inline-block}.dark{background:#20130d;color:#fff}.danger{background:#ffe0e0;color:#a81017}.main{padding:30px 0 80px}.card{background:#fff;border:1px solid #eadfcd;border-radius:22px;padding:20px;margin:0 0 18px;box-shadow:0 14px 36px #0001}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.wide{grid-column:span 2}label{display:grid;gap:6px;font-weight:800;color:#715f53}input,select,textarea{width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:12px;padding:11px}.check{display:flex;gap:8px;align-items:center}.check input{width:auto}.msg{padding:12px 16px;border-radius:16px;margin-bottom:14px;font-weight:900}.ok{background:#e8f8ee;color:#208a3a}.err{background:#ffe0e0;color:#a81017}.scroll{overflow:auto}table{width:100%;min-width:760px;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}.order{display:grid;grid-template-columns:1fr 180px;gap:12px;border:1px solid #eee;border-radius:16px;padding:14px;margin:10px 0}.order pre{white-space:pre-wrap;background:#f5ead6;padding:12px;border-radius:12px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}.preview{width:86px;height:64px;object-fit:cover;border-radius:12px;background:#f5ead6}.hint{font-size:.86rem;color:#715f53;font-weight:700}@media(max-width:850px){.grid,.order{grid-template-columns:1fr}.wide{grid-column:span 1}}</style></head><body><header class="top"><div class="wrap"><a class="logo" href="index.html">KebabKing</a><nav><a class="btn dark" href="index.html">Strona</a> <?php if(logged()): ?><a class="btn" href="admin.php?logout=1">Wyloguj</a><?php endif; ?></nav></div></header><main class="wrap main">
+<?php if($notice): ?><div class="msg ok"><?=e($notice)?></div><?php endif; ?><?php if($error): ?><div class="msg err"><?=e($error)?></div><?php endif; ?>
+<?php if(!logged()): ?><section class="card"><h1>Logowanie admina</h1><form method="post" action="admin.php"><input type="hidden" name="action" value="login"><p><label>Login<input name="username" value="admin"></label></p><p><label>Hasło<input type="password" name="password"></label></p><button type="submit">Zaloguj</button></form></section><section class="card"><h2>Test zapisu</h2><p class="msg <?= $menuWritable?'ok':'err' ?>">menu-data.php: <?= $menuWritable?'zapis OK':'BRAK ZAPISU' ?></p><p class="msg <?= $ordersWritable?'ok':'err' ?>">orders-data.php: <?= $ordersWritable?'zapis OK':'BRAK ZAPISU' ?></p><p class="msg ok">Zdjęcia: tryb bez folderu tymczasowego PHP</p></section><?php else: ?>
+<h1>Panel admina</h1><div class="toolbar"><a class="btn" href="admin.php">Dodaj nowy produkt</a><a class="btn" href="#ingredients">Składniki</a><a class="btn" href="#orders">Zamówienia</a></div><?php if(!$menuWritable): ?><div class="msg err">Brak zapisu do menu-data.php. Ustaw 664 albo 666.</div><?php endif; ?>
+<section class="card"><h2><?= $editP?'Edytuj produkt':'Dodaj produkt' ?></h2><form method="post" action="admin.php" class="grid" id="productForm"><input type="hidden" name="action" value="save_product"><input type="hidden" name="id" value="<?=e($editP['id']??'')?>"><input type="hidden" name="current_image" value="<?=e($editP['image']??'')?>"><input type="hidden" name="image_data" id="imageData"><label>Nazwa<input name="name" value="<?=e($editP['name']??'')?>" required></label><label>Kategoria<select name="category"><?php foreach($categories as $c): ?><option value="<?=$c?>" <?=($editP['category']??'')===$c?'selected':''?>><?=$c?></option><?php endforeach; ?></select></label><label>Cena<input type="number" step="0.01" name="price" value="<?=e($editP['price']??'')?>" required></label><label>Etykieta<input name="badge" value="<?=e($editP['badge']??'')?>"></label><label class="wide">Wgraj zdjęcie<input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp,image/gif"><span class="hint" id="imageHint">Działa bez tymczasowego folderu PHP. Najlepiej zdjęcie do 600 KB.</span></label><label class="wide">Albo link do zdjęcia<input name="image" value="<?=e($editP['image']??'')?>" placeholder="https://..."><span class="hint">Jeśli wgrasz plik, nadpisze link.</span></label><label class="wide">Opis<textarea name="description" rows="3"><?=e($editP['description']??'')?></textarea></label><label class="check"><input type="checkbox" name="active" <?=($editP['active']??true)?'checked':''?>> aktywny</label><button type="submit">Zapisz produkt</button></form><?php if(!empty($editP['image'])): ?><p><img class="preview" src="<?=e($editP['image'])?>" alt="Podgląd"> <span class="hint">Aktualne zdjęcie</span></p><?php endif; ?></section>
+<section class="card"><h2>Produkty</h2><div class="scroll"><table><tr><th>Zdjęcie</th><th>Nazwa</th><th>Kategoria</th><th>Cena</th><th>Status</th><th>Akcje</th></tr><?php foreach($menu['products'] as $p): ?><tr><td><?php if(!empty($p['image'])): ?><img class="preview" src="<?=e($p['image'])?>" alt=""><?php else: ?>—<?php endif; ?></td><td><b><?=e($p['name'])?></b><br><small><?=e($p['badge']??'')?></small></td><td><?=e($p['category'])?></td><td><?=money($p['price'])?></td><td><?=!empty($p['active'])?'aktywny':'ukryty'?></td><td><a class="btn" href="admin.php?edit_product=<?=e($p['id'])?>">Edytuj</a> <form method="post" action="admin.php" style="display:inline" onsubmit="return confirm('Usunąć produkt?')"><input type="hidden" name="action" value="delete_product"><input type="hidden" name="id" value="<?=e($p['id'])?>"><button class="danger" type="submit">Usuń</button></form></td></tr><?php endforeach; ?></table></div></section>
+<section class="card" id="ingredients"><h2><?= $editI?'Edytuj składnik':'Dodaj składnik' ?></h2><form method="post" action="admin.php" class="grid"><input type="hidden" name="action" value="save_ingredient"><input type="hidden" name="id" value="<?=e($editI['id']??'')?>"><label>Grupa<select name="group"><?php foreach($groups as $g=>$lab): ?><option value="<?=$g?>" <?=$editG===$g?'selected':''?>><?=$lab?></option><?php endforeach; ?></select></label><label>Nazwa<input name="name" value="<?=e($editI['name']??'')?>" required></label><label>Etykieta<input name="label" value="<?=e($editI['label']??'')?>"></label><label>Dopłata<input type="number" step="0.01" name="price" value="<?=e($editI['price']??0)?>"></label><label class="check"><input type="checkbox" name="default" <?=!empty($editI['default'])?'checked':''?>> domyślne</label><label class="check"><input type="checkbox" name="active" <?=($editI['active']??true)?'checked':''?>> aktywne</label><button type="submit">Zapisz składnik</button></form></section>
+<section class="card"><h2>Składniki</h2><div class="scroll"><table><tr><th>Grupa</th><th>Nazwa</th><th>Dopłata</th><th>Status</th><th>Akcje</th></tr><?php foreach($groups as $g=>$lab): foreach(($menu['ingredients'][$g]??array()) as $x): ?><tr><td><?=e($lab)?></td><td><b><?=e($x['label']??$x['name'])?></b><br><small><?=e($x['name'])?></small></td><td><?=money($x['price']??0)?></td><td><?=!empty($x['active'])?'aktywny':'ukryty'?><?=!empty($x['default'])?'<br><small>domyślne</small>':''?></td><td><a class="btn" href="admin.php?group=<?=e($g)?>&edit_ingredient=<?=e($x['id'])?>#ingredients">Edytuj</a> <form method="post" action="admin.php" style="display:inline" onsubmit="return confirm('Usunąć składnik?')"><input type="hidden" name="action" value="delete_ingredient"><input type="hidden" name="group" value="<?=e($g)?>"><input type="hidden" name="id" value="<?=e($x['id'])?>"><button class="danger" type="submit">Usuń</button></form></td></tr><?php endforeach; endforeach; ?></table></div></section>
+<section class="card" id="orders"><h2>Zamówienia</h2><?php if(empty($orders['orders'])): ?><p>Brak zamówień.</p><?php endif; ?><?php foreach(($orders['orders']??array()) as $o): ?><article class="order"><div><h3><?=e($o['id'])?></h3><p><b><?=e($o['name']?:'brak imienia')?></b> · tel. <?=e($o['phone'])?> · <?=e($o['created_at'])?> · <?=money($o['total'])?></p><pre><?=e($o['order_text'])?></pre></div><form method="post" action="admin.php"><input type="hidden" name="action" value="order_status"><input type="hidden" name="id" value="<?=e($o['id'])?>"><label>Status<select name="status" onchange="this.form.submit()"><?php foreach($statusList as $s): ?><option value="<?=$s?>" <?=($o['status']??'')===$s?'selected':''?>><?=$s?></option><?php endforeach; ?></select></label></form></article><?php endforeach; ?></section>
+<script>(function(){const f=document.getElementById('imageFile'),d=document.getElementById('imageData'),h=document.getElementById('imageHint');if(!f||!d)return;f.addEventListener('change',function(){const x=f.files&&f.files[0];d.value='';if(!x)return;if(!/^image\/(jpeg|png|webp|gif)$/.test(x.type)){h.textContent='Zły format. Wybierz JPG, PNG, WEBP albo GIF.';f.value='';return;}if(x.size>650000){h.textContent='Zdjęcie za duże dla tego trybu. Zmniejsz do około 600 KB.';f.value='';return;}const r=new FileReader();r.onload=function(){d.value=String(r.result||'');h.textContent='Zdjęcie gotowe. Kliknij Zapisz produkt.';};r.onerror=function(){h.textContent='Nie udało się odczytać zdjęcia.';f.value='';};r.readAsDataURL(x);});})();</script>
+<?php endif; ?></main></body></html>
