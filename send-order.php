@@ -44,7 +44,7 @@ $paymentMethod = clean(isset($data['payment_method']) ? $data['payment_method'] 
 $orderText = clean(isset($data['order']) ? $data['order'] : '', 5000);
 $total = (float)(isset($data['total']) ? $data['total'] : 0);
 
-$allowedPayments = array('Płatność przy odbiorze', 'Karta przy odbiorze', 'BLIK / online');
+$allowedPayments = array('Płatność przy odbiorze', 'Karta przy odbiorze', 'BLIK na telefon');
 if (!in_array($paymentMethod, $allowedPayments, true)) $paymentMethod = 'Płatność przy odbiorze';
 
 if ($phone === '') respond(400, array('ok' => false, 'error' => 'Brakuje telefonu'));
@@ -53,9 +53,9 @@ if ($mode === 'Dostawa' && $address === '') respond(400, array('ok' => false, 'e
 if ($total <= 0) respond(400, array('ok' => false, 'error' => 'Błędna kwota zamówienia'));
 
 $orderId = 'KK-' . date('Ymd-His') . '-' . random_int(100, 999);
-$isOnlinePayment = ($paymentMethod === 'BLIK / online');
-$paymentStatus = $isOnlinePayment ? 'oczekuje na płatność' : 'płatność przy odbiorze';
-$paymentUrl = $isOnlinePayment ? 'payment-demo.php?order=' . rawurlencode($orderId) : '';
+$isBlikPhone = ($paymentMethod === 'BLIK na telefon');
+$paymentStatus = $isBlikPhone ? 'oczekuje na płatność' : 'płatność przy odbiorze';
+$paymentUrl = $isBlikPhone ? 'payment-demo.php?order=' . rawurlencode($orderId) : '';
 
 $order = array(
   'id' => $orderId,
@@ -92,6 +92,7 @@ $message .= "Telefon: " . $phone . "\n";
 $message .= "Odbiór: " . $mode . "\n";
 $message .= "Płatność: " . $paymentMethod . "\n";
 $message .= "Status płatności: " . $paymentStatus . "\n";
+if ($paymentUrl !== '') $message .= "Instrukcja BLIK: " . $paymentUrl . "\n";
 if ($address !== '') $message .= "Adres: " . $address . "\n";
 $message .= "\nZamówienie:\n" . $orderText . "\n";
 
