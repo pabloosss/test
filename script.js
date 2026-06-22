@@ -5,11 +5,10 @@ const contactForm = document.querySelector('#contactForm');
 const formNote = document.querySelector('#formNote');
 const siteType = document.querySelector('#siteType');
 const packageButtons = document.querySelectorAll('.choose-package');
-const exampleButtons = document.querySelectorAll('.example-card');
 const faqQuestions = document.querySelectorAll('.faq-question');
 
 // TODO: podmień na prawdziwe dane kontaktowe.
-const CONTACT_EMAIL = 'kontakt@example.pl';
+const CONTACT_EMAIL = 'kontakt@cyberforma.pl';
 const CONTACT_PHONE = '+48 000 000 000';
 
 if (year) {
@@ -44,22 +43,12 @@ function setMessage(text) {
 packageButtons.forEach((button) => {
   button.addEventListener('click', () => {
     if (siteType) {
-      siteType.value = 'Strona firmowa';
+      siteType.value = button.dataset.package?.includes('Zamówienia')
+        ? 'Zamówienia online'
+        : 'Strona na bazie demo';
     }
 
     setMessage(`Interesuje mnie pakiet: ${button.dataset.package}. Proszę o krótką wycenę i informację, co będzie potrzebne do startu.`);
-    scrollToContact();
-  });
-});
-
-exampleButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const template = button.dataset.template || 'Przykładowa strona demo';
-    if (siteType) {
-      siteType.value = 'Strona firmowa';
-    }
-
-    setMessage(`Interesuje mnie ${template}. Chcę podobną stronę dla mojej firmy.`);
     scrollToContact();
   });
 });
