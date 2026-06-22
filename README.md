@@ -1,4 +1,4 @@
-# Strona Zarobek
+# Cyberforma — strona reklamowa
 
 Profesjonalna strona reklamowa dla osoby tworzącej strony internetowe na zamówienie.
 
@@ -16,17 +16,23 @@ Strona ma reklamować usługę tworzenia stron internetowych dla małych firm. M
 
 ## Obecna wersja
 
-Wersja V2 zawiera:
+Aktualna wersja zawiera:
 
-- profesjonalny hero section
+- stronę główną Cyberforma
 - ofertę usług
-- pakiety cenowe
+- cennik startowy
 - proces współpracy
-- sekcję jakości
-- przykładowe kierunki demo bez martwych linków
-- FAQ
 - telefon i e-mail
 - formularz zapytania o stronę
+- jedno dostępne demo: kebab / restauracja
+
+## Dostępne demo
+
+```text
+demo/kebab/
+```
+
+Na razie na stronie głównej pokazujemy tylko demo kebaba. Kolejne demo branżowe dodamy później, np. mechanik, beauty, transport albo kwiaciarnia.
 
 ## Formularz kontaktowy pyta o
 
@@ -46,10 +52,13 @@ W plikach `index.html` i `script.js` trzeba zmienić dane tymczasowe:
 
 ```text
 +48 000 000 000
-kontakt@example.pl
 ```
 
-na prawdziwy telefon i prawdziwy adres e-mail.
+Mail jest ustawiony jako:
+
+```text
+kontakt@cyberforma.pl
+```
 
 ## Formularz
 
