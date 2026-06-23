@@ -25,15 +25,16 @@ $amount = $order ? money($order['total'] ?? 0) : 'kwota z zamówienia';
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BLIK na telefon — instrukcja</title>
+<title>BLIK na telefon — Kebab-demo</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#fff6df;color:#20130d;display:grid;place-items:center;min-height:100vh;padding:20px}.card{max-width:620px;background:#fff;border:1px solid #eadfcd;border-radius:26px;padding:28px;box-shadow:0 18px 48px #0002}.btn{display:inline-block;border-radius:999px;padding:12px 18px;background:#ffbc0d;color:#20130d;font-weight:900;text-decoration:none}.muted{color:#756154;line-height:1.55}.box{background:#fff0c2;padding:16px;border-radius:18px;margin:16px 0}.row{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid #eadfcd;padding:10px 0}.row strong{text-align:right}.warn{background:#ffe0e0;color:#a81017;padding:12px 14px;border-radius:16px;font-weight:800}@media(max-width:560px){.row{display:grid}.row strong{text-align:left}}
+body{margin:0;font-family:Arial,sans-serif;background:#fff6df;color:#20130d;display:grid;place-items:center;min-height:100vh;padding:20px}.card{max-width:620px;background:#fff;border:1px solid #eadfcd;border-radius:26px;padding:28px;box-shadow:0 18px 48px #0002}.brand{font-weight:900;color:#d71920}.btn{display:inline-block;border-radius:999px;padding:12px 18px;background:#ffbc0d;color:#20130d;font-weight:900;text-decoration:none}.muted{color:#756154;line-height:1.55}.box{background:#fff0c2;padding:16px;border-radius:18px;margin:16px 0}.row{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid #eadfcd;padding:10px 0}.row strong{text-align:right}.warn{background:#ffe0e0;color:#a81017;padding:12px 14px;border-radius:16px;font-weight:800}@media(max-width:560px){.row{display:grid}.row strong{text-align:left}}
 </style>
 </head>
 <body>
   <main class="card">
+    <p class="brand">Kebab-demo</p>
     <h1>BLIK na telefon</h1>
-    <p class="muted">To jest ręczna płatność. Strona nie pobiera pieniędzy automatycznie. Po przelewie obsługa sprawdza płatność i oznacza zamówienie jako opłacone w panelu.</p>
+    <p class="muted">Ręczna płatność do pokazania w wersji demonstracyjnej. Po przelewie status płatności zmieniasz w panelu zamówień.</p>
 
     <div class="box">
       <div class="row"><span>Numer telefonu</span><strong><?=h($BLIK_PHONE)?></strong></div>
@@ -48,7 +49,7 @@ body{margin:0;font-family:Arial,sans-serif;background:#fff6df;color:#20130d;disp
       <p class="warn">Nie znaleziono zamówienia. Wróć na stronę i złóż zamówienie ponownie.</p>
     <?php endif; ?>
 
-    <p class="muted">Po wysłaniu BLIKA nie zamykaj zamówienia w banku bez sprawdzenia kwoty i numeru telefonu.</p>
+    <p class="muted">W prawdziwej realizacji numer telefonu podmieniasz na numer właściciela lokalu.</p>
     <p><a class="btn" href="index.html">Wróć na stronę</a> <a class="btn" href="admin-orders.php">Panel zamówień</a></p>
   </main>
 </body>
