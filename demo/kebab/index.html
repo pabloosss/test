@@ -2,93 +2,71 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kebabownia / restauracja | Demo Cyberforma</title>
-  <meta name="description" content="Przykładowa strona demo: Kebabownia / restauracja. Układ strony internetowej dla lokalnej firmy przygotowany przez Cyberforma." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Kebab King — kebab, grill i boxy</title>
+  <meta name="description" content="Kebab King — lawasz, boxy, talerze, grill, odbiór własny i dostawa." />
+  <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/pabloosss/strona-zarobek@kebab/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/pabloosss/strona-zarobek@kebab/features.css" />
 </head>
-<body class="demo-body theme-kebab">
-  <header class="demo-nav">
-    <div class="container demo-nav-inner">
-      <a class="brand" href="../../">
-        <span class="brand-mark">C</span>
-        <span class="brand-name">Cyber<span>forma</span></span>
-      </a>
-      <a class="demo-back" href="../../#demo">← Wróć do strony głównej</a>
-    </div>
+<body>
+  <div class="deal-bar"><span>🔥 Lunch 11:00–15:00</span><strong>Lawasz + frytki + napój od 32,50 zł</strong></div>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Główna nawigacja">
+      <a class="brand" href="#hero"><span class="brand-mark">K</span><span class="brand-text">Kebab<span>King</span></span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Otwórz menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="#menu">Menu</a>
+        <a href="#personalizacja">Zamów</a>
+        <a href="#lokal">Lokal</a>
+        <a href="#kontakt" class="nav-cta">Kontakt</a>
+      </div>
+    </nav>
   </header>
 
   <main>
-    <section class="demo-hero">
-      <div class="container demo-hero-grid">
-        <div>
-          <p class="eyebrow">Demo gastro</p>
-          <h1>Kebabownia / restauracja</h1>
-          <p>Demo strony dla lokalu gastronomicznego: menu, promocje, szybki telefon, godziny otwarcia i kierunek pod zamówienia online.</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="../../#kontakt">Chcę podobną stronę</a>
-            <a class="btn btn-secondary" href="../../#pakiety">Zobacz cennik</a>
-          </div>
+    <section class="hero" id="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Kebab · grill · boxy</p>
+          <h1>Dobry kebab bez kombinowania.</h1>
+          <p class="hero-text">Ciepły lawasz, dobrze doprawione mięso, świeże dodatki i sosy, które robią robotę. Zamów do odbioru albo z dostawą.</p>
+          <div class="hero-actions"><a href="#personalizacja" class="btn btn-primary">Zamów teraz</a><a href="#menu" class="btn btn-secondary">Zobacz menu</a></div>
+          <div class="hero-stats"><div><strong>15–20 min</strong><span>średni odbiór</span></div><div><strong>4.8/5</strong><span>ocena Google</span></div><div><strong id="openStatus">10:00–23:00</strong><span id="openStatusText">codziennie</span></div></div>
         </div>
-
-        <aside class="demo-panel">
-          <div class="demo-panel-card">
-            <h3>Co pokazuje to demo?</h3>
-            <ul class="demo-list">
-              <li>menu i promocje</li>
-              <li>telefon oraz mapa</li>
-              <li>odbiór / dostawa</li>
-              <li>miejsce na zamówienia online</li>
-            </ul>
-          </div>
-        </aside>
+        <div class="hero-visual">
+          <div class="hero-photo photo-shell"><img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1400&q=86" alt="Świeżo przygotowany kebab" data-fallback><div class="photo-fallback">🥙</div></div>
+          <div class="hero-offer-card"><span>Najczęściej wybierane</span><strong>Mega rollo mieszane</strong><small>mieszane mięso · frytki · sos czosnkowy albo ostry</small><em>od 34,00 zł</em></div>
+        </div>
       </div>
     </section>
 
-    <section class="demo-content">
-      <div class="container demo-content-grid">
-        <article class="demo-tile">
-          <h2>Przykładowa oferta</h2>
-          <p>Ta sekcja pokazuje, jak można przedstawić najważniejsze usługi lub produkty bez przeładowania strony.</p>
-          <div class="demo-menu">
-            <div class="demo-menu-item"><strong>Kebab klasyczny</strong><span>19 zł</span></div>
-            <div class="demo-menu-item"><strong>Kebab z frytkami</strong><span>24 zł</span></div>
-            <div class="demo-menu-item"><strong>Box kebab</strong><span>22 zł</span></div>
-            <div class="demo-menu-item"><strong>Zestaw dnia</strong><span>29 zł</span></div>
-          </div>
-        </article>
-
-        <article class="demo-tile">
-          <h2>Kontakt i działanie</h2>
-          <p>Na prawdziwej stronie tutaj mogą pojawić się: telefon, mapa Google, godziny otwarcia, formularz, link do rezerwacji lub zamówienia.</p>
-          <ul>
-            <li>czytelny przycisk kontaktu</li>
-            <li>sekcja z zaufaniem i opiniami</li>
-            <li>układ gotowy pod telefon</li>
-          </ul>
-        </article>
-
-        <article class="demo-tile">
-          <h3>Promocje</h3>
-          <p>Sekcja na promocję dnia, zestawy obiadowe albo kod rabatowy dla klientów z internetu.</p>
-        </article>
-        <article class="demo-tile">
-          <h3>Godziny i lokalizacja</h3>
-          <p>Czytelne informacje o adresie, godzinach otwarcia i przycisk prowadzący do mapy.</p>
-        </article>
+    <section class="trust-strip container" aria-label="Najważniejsze informacje">
+      <div class="trust-grid">
+        <article class="trust-card"><div class="stars">★★★★★</div><strong>4.8 / 5 w Google</strong><span>127 opinii klientów.</span><a href="https://www.google.com/search?q=Kebab+King+Warszawa+opinie" target="_blank" rel="noreferrer">Zobacz opinie</a></article>
+        <article class="trust-card"><span class="open-pill">Otwarte codziennie</span><strong>10:00–23:00</strong><small>Odbiór własny zwykle w 15–20 minut.</small></article>
+        <article class="trust-card"><strong>ul. Kebabowa 7</strong><span>Warszawa</span><a href="https://www.google.com/maps/dir/?api=1&destination=ul.%20Kebabowa%207%2C%20Warszawa" target="_blank" rel="noreferrer">Wyznacz trasę</a></article>
       </div>
     </section>
 
-    <section class="demo-cta">
-      <div class="container">
-        <h2>To tylko przykład. Zmieniamy teksty, zdjęcia, kolory i ofertę pod konkretną firmę.</h2>
-        <p>Można zacząć od takiego demo i szybko przerobić je na stronę dla lokalu, usługi albo małego biznesu.</p>
-        <a class="btn btn-primary" href="../../#kontakt">Zamów podobną stronę</a>
-      </div>
-    </section>
+    <section class="section menu-section" id="menu"><div class="container"><div class="section-heading split"><div><p class="eyebrow">Menu</p><h2>Wybierz, na co masz ochotę.</h2></div><p>Lawasz, box, talerz, grill albo coś bez mięsa. Poniżej znajdziesz najpopularniejsze pozycje.</p></div><div class="category-tabs" id="categoryTabs"><button class="active" data-category="all">Wszystko</button><button data-category="lawasz">Lawasz</button><button data-category="box">Boxy</button><button data-category="talerz">Talerze</button><button data-category="grill">Grill</button><button data-category="vege">Vege</button><button data-category="dodatki">Dodatki</button></div><div class="menu-grid" id="menuGrid"></div></div></section>
+
+    <section class="section order-section" id="personalizacja"><div class="container order-layout"><div class="order-copy"><p class="eyebrow">Zamówienie</p><h2>Złóż kebaba po swojemu.</h2><p>Wybierz danie, sosy i dodatki. Podaj telefon, żeby obsługa mogła potwierdzić zamówienie, jeśli będzie taka potrzeba.</p><div class="order-benefits"><div><strong>1</strong><span>wybierz danie</span></div><div><strong>2</strong><span>dodaj sosy i dodatki</span></div><div><strong>3</strong><span>wyślij zamówienie</span></div></div></div>
+      <form class="order-form" id="orderForm"><div class="form-block"><label for="productSelect">Danie</label><select id="productSelect" name="product"></select></div><div class="form-block"><span class="form-label">Rozmiar</span><div class="choice-grid" data-choice-group="size"></div></div><div class="form-block"><span class="form-label">Mięso / baza</span><div class="choice-grid two"></div></div><div class="form-block"><span class="form-label">Sos</span><div class="chips"></div></div><div class="form-block"><span class="form-label">Dodatki w środku</span><div class="chips"></div></div><div class="form-block"><span class="form-label">Dodatki płatne</span><div class="extras-grid"></div></div><div class="form-row"><div class="form-block"><label for="quantity">Ilość</label><div class="qty-control"><button type="button" id="qtyMinus">−</button><input id="quantity" name="quantity" type="number" min="1" max="20" value="1"><button type="button" id="qtyPlus">+</button></div></div><div class="form-block"><label for="modeSelect">Odbiór</label><select id="modeSelect" name="mode"><option value="Odbiór własny" data-price="0">Odbiór własny</option><option value="Dostawa" data-price="6">Dostawa +6 zł</option></select></div></div><div class="form-block"><label for="note">Uwagi</label><textarea id="note" name="note" rows="3" placeholder="Np. bez cebuli, sos osobno, bardzo ostry"></textarea></div></form>
+      <aside class="summary-card"><span class="summary-kicker">Podsumowanie</span><h3 id="summaryTitle">Wybierz danie</h3><p id="summaryDetails">Twoje zamówienie pojawi się tutaj.</p><div class="price-line"><span>Razem</span><strong id="summaryPrice">0,00 zł</strong></div><div class="summary-actions"><a class="btn btn-primary" id="mailOrder" href="#">Wyślij zamówienie</a><button type="button" class="btn btn-secondary" id="copyOrder">Kopiuj</button></div><small id="copyStatus">Podaj telefon, żebyśmy mogli potwierdzić zamówienie.</small></aside></div></section>
+
+    <section class="section map-section" id="lokal"><div class="container"><div class="section-heading split"><div><p class="eyebrow">Lokal</p><h2>Mapa, godziny i kontakt.</h2></div><p>Sprawdź trasę, godziny otwarcia albo zadzwoń, jeśli chcesz zamówić większą ilość.</p></div><div class="map-layout"><div class="map-frame"><iframe loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" src="https://www.google.com/maps?q=ul.%20Kebabowa%207%2C%20Warszawa&output=embed"></iframe></div><div class="map-panel"><article class="google-card"><p class="eyebrow">Google</p><h3>4.8 / 5</h3><div class="google-score"><strong>★★★★★</strong><span>127 opinii klientów</span></div><div class="map-actions"><a class="btn btn-primary" href="https://www.google.com/search?q=Kebab+King+Warszawa+opinie" target="_blank" rel="noreferrer">Opinie</a><a class="btn btn-secondary" href="https://www.google.com/search?q=Kebab+King+Warszawa+dodaj+opini%C4%99" target="_blank" rel="noreferrer">Dodaj opinię</a></div></article><article class="hours-card"><p class="eyebrow">Godziny</p><h3>10:00–23:00</h3><div class="hours-list"><div><span>Poniedziałek–Czwartek</span><strong>10:00–23:00</strong></div><div><span>Piątek–Sobota</span><strong>10:00–00:00</strong></div><div><span>Niedziela</span><strong>10:00–23:00</strong></div></div></article><article class="route-card"><p class="eyebrow">Kontakt</p><h3>ul. Kebabowa 7, Warszawa</h3><div class="social-actions"><a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&destination=ul.%20Kebabowa%207%2C%20Warszawa" target="_blank" rel="noreferrer">Wyznacz trasę</a><a class="btn btn-secondary" href="tel:+48123456789">Zadzwoń</a><a class="btn btn-secondary" href="https://wa.me/48123456789?text=Dzie%C5%84%20dobry%2C%20chc%C4%99%20z%C5%82o%C5%BCy%C4%87%20zam%C3%B3wienie" target="_blank" rel="noreferrer">WhatsApp</a></div></article></div></div></div></section>
+
+    <section class="contact" id="kontakt"><div class="container contact-grid"><div><p class="eyebrow">Kontakt</p><h2>Dzwoń albo zamów przez stronę.</h2><p>Przy większym zamówieniu najlepiej zadzwonić wcześniej. Przy pojedynczym kebabie spokojnie użyj formularza.</p></div><div class="contact-panel"><a href="tel:+48123456789">📞 123 456 789</a><a href="#personalizacja">🥙 Zamów teraz</a><a href="https://www.google.com/maps/dir/?api=1&destination=ul.%20Kebabowa%207%2C%20Warszawa" target="_blank" rel="noreferrer">📍 Wyznacz trasę</a><a href="https://wa.me/48123456789?text=Dzie%C5%84%20dobry%2C%20chc%C4%99%20z%C5%82o%C5%BCy%C4%87%20zam%C3%B3wienie" target="_blank" rel="noreferrer">💬 WhatsApp</a></div></div></section>
   </main>
+
+  <nav class="mobile-bar"><a href="#menu">Menu</a><a href="#personalizacja" class="mobile-main">Zamów</a><a href="tel:+48123456789">Telefon</a><a href="https://www.google.com/maps/dir/?api=1&destination=ul.%20Kebabowa%207%2C%20Warszawa" target="_blank" rel="noreferrer">Trasa</a></nav>
+  <footer class="footer"><div class="container footer-content"><p>© <span id="year"></span> KebabKing. Kebab, grill i boxy.</p><div class="footer-links"><a href="../../index.html">Wróć do Cyberforma</a><a href="https://www.google.com/search?q=Kebab+King+Warszawa+opinie" target="_blank" rel="noreferrer">Opinie Google</a></div></div></footer>
+  <script src="https://cdn.jsdelivr.net/gh/pabloosss/strona-zarobek@kebab/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/pabloosss/strona-zarobek@kebab/features.js"></script>
 </body>
 </html>
