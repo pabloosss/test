@@ -34,7 +34,7 @@ function save_orders($file, $data) {
 
 if (!logged()) {
   http_response_code(403);
-  echo '<!doctype html><meta charset="utf-8"><body style="font-family:Arial;padding:30px"><h1>Brak dostępu</h1><p>Najpierw zaloguj się w <a href="admin.php">admin.php</a>.</p></body>';
+  echo '<!doctype html><meta charset="utf-8"><body style="font-family:Arial;padding:30px"><h1>Brak dostępu</h1><p>Najpierw zaloguj się w <a href="admin.php">panelu admina</a>.</p></body>';
   exit;
 }
 
@@ -83,13 +83,13 @@ foreach ($orders['orders'] as $order) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zamówienia — KebabKing</title>
+<title>Zamówienia — Kebab-demo</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#fff6df;color:#20130d}.wrap{width:min(1200px,calc(100% - 32px));margin:auto}.top{background:#fff;border-bottom:1px solid #eadfcd}.top .wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px}.logo{font-size:24px;font-weight:900;color:#d71920;text-decoration:none}.btn,button{border:0;border-radius:999px;padding:10px 14px;background:#ffbc0d;color:#20130d;font-weight:900;text-decoration:none;cursor:pointer;display:inline-block}.dark{background:#20130d;color:#fff}.main{padding:28px 0 80px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.stat,.order{background:#fff;border:1px solid #eadfcd;border-radius:22px;padding:18px;box-shadow:0 12px 32px #0001}.stat span{display:block;color:#756154;font-weight:800}.stat strong{display:block;margin-top:6px;font-size:1.7rem}.notice{background:#e8f8ee;color:#208a3a;padding:12px 16px;border-radius:16px;margin-bottom:16px;font-weight:900}.orders{display:grid;gap:14px}.order-head{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:7px 10px;border-radius:999px;background:#f5ead6;font-weight:900}.paid{background:#e8f8ee;color:#208a3a}.wait{background:#fff0c2;color:#8a4b00}.cancel{background:#ffe0e0;color:#a81017}.order pre{white-space:pre-wrap;background:#f5ead6;border-radius:14px;padding:12px;line-height:1.45}.forms{display:grid;grid-template-columns:1fr 1fr;gap:10px}select{width:100%;padding:10px;border:1px solid #ddd;border-radius:12px}@media(max-width:850px){.grid,.forms{grid-template-columns:1fr}.order-head{display:grid}}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap"><a class="logo" href="admin.php">KebabKing Admin</a><nav><a class="btn dark" href="admin.php">Menu</a> <a class="btn" href="index.html">Strona</a></nav></div></header>
+<header class="top"><div class="wrap"><a class="logo" href="admin.php">Kebab-demo</a><nav><a class="btn dark" href="admin.php">Menu</a> <a class="btn" href="index.html">Strona</a></nav></div></header>
 <main class="wrap main">
 <h1>Zamówienia</h1>
 <?php if($notice): ?><div class="notice"><?=h($notice)?></div><?php endif; ?>
