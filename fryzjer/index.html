@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumière Hair Studio | Salon fryzjerski</title>
+  <meta name="description" content="Demo nowoczesnej strony dla salonu fryzjerskiego: usługi, cennik, galeria, opinie i formularz rezerwacji." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff8f3;
+      --surface: #ffffff;
+      --ink: #171313;
+      --muted: #756965;
+      --soft: #f5e6dc;
+      --soft-2: #ead2c5;
+      --gold: #c99357;
+      --rose: #d99a8f;
+      --dark: #251b18;
+      --shadow: 0 22px 70px rgba(47, 31, 26, .14);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #f9d8c5 0, transparent 32rem), var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      background: var(--dark);
+      color: #fff2e8;
+      font-size: 14px;
+    }
+
+    .topbar .container {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 10px 0;
+      flex-wrap: wrap;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 248, 243, .84);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(37, 27, 24, .08);
+    }
+
+    .nav {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      font-size: 20px;
+    }
+
+    .logo-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #211714, #c99357);
+      color: #fff;
+      box-shadow: 0 12px 32px rgba(201, 147, 87, .32);
+      font-family: "Playfair Display", serif;
+      font-size: 24px;
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      color: #473b37;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .menu a:hover { color: var(--gold); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      border: 0;
+      background: var(--ink);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 16px 30px rgba(23, 19, 19, .18);
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 38px rgba(23, 19, 19, .23);
+      background: #000;
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid rgba(23, 19, 19, .12);
+      box-shadow: none;
+    }
+
+    .mobile-btn {
+      display: none;
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      border: 1px solid rgba(23, 19, 19, .12);
+      background: #fff;
+      font-size: 22px;
+    }
+
+    .hero {
+      padding: 72px 0 52px;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      align-items: center;
+      gap: 54px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(201, 147, 87, .25);
+      color: #7a5131;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    h1, h2, h3 {
+      font-family: "Playfair Display", Georgia, serif;
+      line-height: 1.04;
+      margin: 0;
+      color: var(--ink);
+    }
+
+    h1 {
+      font-size: clamp(44px, 7vw, 86px);
+      letter-spacing: -.06em;
+      max-width: 760px;
+    }
+
+    h1 span { color: var(--gold); }
+
+    .lead {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 24px 0 30px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .trust-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 34px;
+      max-width: 650px;
+    }
+
+    .trust-card {
+      padding: 17px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .72);
+      border: 1px solid rgba(37, 27, 24, .08);
+    }
+
+    .trust-card strong {
+      display: block;
+      font-size: 22px;
+      letter-spacing: -.03em;
+    }
+
+    .trust-card span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .hero-visual {
+      position: relative;
+      min-height: 610px;
+    }
+
+    .photo-stack {
+      position: absolute;
+      inset: 0;
+    }
+
+    .photo-main {
+      position: absolute;
+      right: 0;
+      top: 18px;
+      width: 78%;
+      height: 520px;
+      border-radius: 46px;
+      background:
+        linear-gradient(160deg, rgba(23, 19, 19, .12), rgba(23, 19, 19, .55)),
+        url("https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=85") center/cover;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .photo-small {
+      position: absolute;
+      left: 0;
+      bottom: 28px;
+      width: 48%;
+      min-height: 275px;
+      border: 12px solid var(--bg);
+      border-radius: 34px;
+      background:
+        linear-gradient(150deg, rgba(255, 248, 243, .08), rgba(37, 27, 24, .34)),
+        url("https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?auto=format&fit=crop&w=720&q=85") center/cover;
+      box-shadow: var(--shadow);
+    }
+
+    .floating-card {
+      position: absolute;
+      right: 16px;
+      bottom: 26px;
+      width: min(330px, 88%);
+      padding: 22px;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, .88);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .floating-card strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .stars { color: #f2a821; letter-spacing: 2px; }
+
+    section { padding: 78px 0; }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(34px, 5vw, 58px);
+      letter-spacing: -.045em;
+      max-width: 760px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      max-width: 420px;
+      margin: 0;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .service-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 305px;
+      padding: 26px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 16px 38px rgba(47, 31, 26, .08);
+      border: 1px solid rgba(37, 27, 24, .07);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 26px 60px rgba(47, 31, 26, .13);
+    }
+
+    .service-card .icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: var(--soft);
+      font-size: 25px;
+      margin-bottom: 34px;
+    }
+
+    .service-card h3 { font-size: 27px; margin-bottom: 12px; }
+    .service-card p { color: var(--muted); margin: 0 0 22px; }
+    .price { font-weight: 900; color: #7f4e23; }
+
+    .banner {
+      border-radius: 38px;
+      padding: 42px;
+      background:
+        linear-gradient(120deg, rgba(37, 27, 24, .92), rgba(82, 49, 37, .78)),
+        url("https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1400&q=85") center/cover;
+      color: #fff9f4;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 30px;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .banner h2 { color: white; font-size: clamp(30px, 4vw, 50px); }
+    .banner p { color: rgba(255, 249, 244, .78); max-width: 650px; margin: 16px 0 0; }
+    .banner .btn { background: white; color: var(--ink); }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      grid-auto-rows: 245px;
+      gap: 18px;
+    }
+
+    .gallery-card {
+      border-radius: 30px;
+      overflow: hidden;
+      position: relative;
+      background: var(--soft);
+      box-shadow: 0 18px 40px rgba(47, 31, 26, .09);
+    }
+
+    .gallery-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(23, 19, 19, .58), transparent 55%);
+      z-index: 1;
+    }
+
+    .gallery-card:nth-child(1) {
+      grid-row: span 2;
+      background: url("https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=900&q=85") center/cover;
+    }
+
+    .gallery-card:nth-child(2) { background: url("https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=700&q=85") center/cover; }
+    .gallery-card:nth-child(3) { background: url("https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=700&q=85") center/cover; }
+    .gallery-card:nth-child(4) { background: url("https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=700&q=85") center/cover; }
+    .gallery-card:nth-child(5) { background: url("https://images.unsplash.com/photo-1595475038665-8fd5603472f9?auto=format&fit=crop&w=700&q=85") center/cover; }
+
+    .gallery-label {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 20px;
+      z-index: 2;
+      color: white;
+      font-weight: 800;
+    }
+
+    .process-grid, .team-grid, .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .step, .team-card, .review {
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(37, 27, 24, .08);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: 0 16px 38px rgba(47, 31, 26, .07);
+    }
+
+    .step-number {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: white;
+      font-weight: 900;
+      margin-bottom: 24px;
+    }
+
+    .step h3, .team-card h3 { font-size: 27px; margin-bottom: 10px; }
+    .step p, .team-card p, .review p { color: var(--muted); margin: 0; }
+
+    .team-photo {
+      height: 250px;
+      border-radius: 24px;
+      margin-bottom: 20px;
+      background: var(--soft-2) center/cover;
+    }
+
+    .team-card:nth-child(1) .team-photo { background-image: url("https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=700&q=85"); }
+    .team-card:nth-child(2) .team-photo { background-image: url("https://images.unsplash.com/photo-1595475207225-428b62bda831?auto=format&fit=crop&w=700&q=85"); }
+    .team-card:nth-child(3) .team-photo { background-image: url("https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=700&q=85"); }
+
+    .pricing {
+      background: #fff;
+      border-top: 1px solid rgba(37, 27, 24, .07);
+      border-bottom: 1px solid rgba(37, 27, 24, .07);
+    }
+
+    .price-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .price-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 22px 24px;
+      border-radius: 22px;
+      background: #fff8f3;
+      border: 1px solid rgba(37, 27, 24, .07);
+    }
+
+    .price-item strong { display: block; font-size: 17px; }
+    .price-item span { color: var(--muted); font-size: 14px; }
+    .price-item b { font-size: 20px; color: #7f4e23; white-space: nowrap; }
+
+    .review .stars { margin-bottom: 16px; display: block; }
+    .client { display: flex; align-items: center; gap: 12px; margin-top: 22px; font-weight: 800; }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f6c9b6, #c99357);
+      display: grid;
+      place-items: center;
+      color: white;
+    }
+
+    .booking {
+      padding-bottom: 96px;
+    }
+
+    .booking-card {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 26px;
+      padding: 28px;
+      border-radius: 38px;
+      background: var(--dark);
+      color: #fff9f4;
+      box-shadow: var(--shadow);
+    }
+
+    .booking-info {
+      padding: 18px;
+      border-radius: 30px;
+      background:
+        linear-gradient(150deg, rgba(37, 27, 24, .88), rgba(37, 27, 24, .48)),
+        url("https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=900&q=85") center/cover;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .booking-info h2 { color: white; font-size: clamp(34px, 5vw, 58px); }
+    .booking-info p { color: rgba(255, 249, 244, .76); max-width: 480px; }
+
+    form {
+      background: #fff9f4;
+      color: var(--ink);
+      border-radius: 30px;
+      padding: 26px;
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(37, 27, 24, .12);
+      border-radius: 17px;
+      padding: 15px 16px;
+      font: inherit;
+      background: white;
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(201, 147, 87, .13);
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    footer {
+      background: #171313;
+      color: #fff8f3;
+      padding: 38px 0;
+    }
+
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+    footer p { color: rgba(255, 248, 243, .64); margin: 8px 0 0; }
+
+    .sticky-cta {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: none;
+      width: min(420px, calc(100% - 28px));
+      justify-content: center;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .booking-card, .banner { grid-template-columns: 1fr; }
+      .hero-visual { min-height: 520px; }
+      .services-grid, .process-grid, .team-grid, .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .gallery-card:nth-child(1) { grid-row: span 1; }
+      .section-head { align-items: start; flex-direction: column; }
+    }
+
+    @media (max-width: 760px) {
+      .topbar { display: none; }
+      .nav { height: 70px; }
+      .menu {
+        position: fixed;
+        left: 20px;
+        right: 20px;
+        top: 82px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px;
+        border-radius: 24px;
+        background: white;
+        box-shadow: var(--shadow);
+      }
+      .menu.open { display: flex; }
+      .menu .btn { width: 100%; }
+      .mobile-btn { display: grid; place-items: center; }
+      .hero { padding-top: 38px; }
+      .hero-visual { min-height: 430px; }
+      .photo-main { width: 100%; height: 380px; border-radius: 32px; }
+      .photo-small { display: none; }
+      .floating-card { left: 18px; right: 18px; bottom: 0; width: auto; }
+      .trust-row, .services-grid, .process-grid, .team-grid, .reviews-grid, .price-list, .gallery-grid, .form-row { grid-template-columns: 1fr; }
+      section { padding: 58px 0; }
+      .banner { padding: 30px; border-radius: 30px; }
+      .booking-card { padding: 14px; border-radius: 30px; }
+      .booking-info { min-height: 420px; }
+      .sticky-cta { display: flex; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container">
+      <span>Warszawa • ul. Piękna 18 • Pon–Sob 9:00–20:00</span>
+      <span>Rezerwacje: +48 500 300 200</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="container nav">
+      <a href="#top" class="logo" aria-label="Lumière Hair Studio">
+        <span class="logo-mark">L</span>
+        <span>Lumière Hair Studio</span>
+      </a>
+      <nav class="menu" id="menu">
+        <a href="#uslugi">Usługi</a>
+        <a href="#galeria">Galeria</a>
+        <a href="#cennik">Cennik</a>
+        <a href="#opinie">Opinie</a>
+        <a href="#kontakt" class="btn">Umów wizytę</a>
+      </nav>
+      <button class="mobile-btn" id="mobileBtn" aria-label="Otwórz menu">☰</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">✦ Salon premium • koloryzacja • pielęgnacja</div>
+          <h1>Włosy, które wyglądają <span>luksusowo</span> każdego dnia.</h1>
+          <p class="lead">Nowoczesny salon fryzjerski dla kobiet i mężczyzn. Stawiamy na dokładną konsultację, naturalny efekt i wygodną rezerwację online.</p>
+          <div class="hero-actions">
+            <a href="#kontakt" class="btn">Zarezerwuj termin</a>
+            <a href="#galeria" class="btn secondary">Zobacz realizacje</a>
+          </div>
+          <div class="trust-row">
+            <div class="trust-card"><strong>4.9/5</strong><span>średnia ocen klientów</span></div>
+            <div class="trust-card"><strong>8 lat</strong><span>doświadczenia stylistów</span></div>
+            <div class="trust-card"><strong>1:1</strong><span>konsultacja przed usługą</span></div>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Zdjęcia salonu fryzjerskiego">
+          <div class="photo-stack">
+            <div class="photo-main"></div>
+            <div class="photo-small"></div>
+            <div class="floating-card">
+              <span class="stars">★★★★★</span>
+              <strong>„Najlepszy blond, jaki miałam.”</strong>
+              <span>Efekt naturalny, włosy miękkie i zero żółtych tonów.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="uslugi">
+      <div class="container">
+        <div class="section-head">
+          <h2>Usługi dopasowane do Twoich włosów.</h2>
+          <p>Układ strony jest prosty: klient od razu widzi ofertę, cennik, efekty, opinie i przycisk rezerwacji.</p>
+        </div>
+        <div class="services-grid">
+          <article class="service-card">
+            <div class="icon">✂️</div>
+            <h3>Strzyżenie</h3>
+            <p>Damskie, męskie i dziecięce. Dobór cięcia do kształtu twarzy.</p>
+            <span class="price">od 90 zł</span>
+          </article>
+          <article class="service-card">
+            <div class="icon">🎨</div>
+            <h3>Koloryzacja</h3>
+            <p>Tonowanie, sombre, refleksy, globalna koloryzacja i odświeżenie koloru.</p>
+            <span class="price">od 220 zł</span>
+          </article>
+          <article class="service-card">
+            <div class="icon">✨</div>
+            <h3>Blond Expert</h3>
+            <p>Bezpieczne rozjaśnianie, chłodne odcienie i regeneracja po zabiegu.</p>
+            <span class="price">od 350 zł</span>
+          </article>
+          <article class="service-card">
+            <div class="icon">💆</div>
+            <h3>Pielęgnacja</h3>
+            <p>Botox, keratyna, odbudowa i zabiegi wygładzające włosy.</p>
+            <span class="price">od 160 zł</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="banner">
+          <div>
+            <h2>Demo gotowe pod klienta z branży beauty.</h2>
+            <p>Styl: jasne tło, czarne detale, złoto-różane akcenty, duże zdjęcia, sekcja opinii i mocne przyciski do rezerwacji.</p>
+          </div>
+          <a href="#kontakt" class="btn">Umów konsultację</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="galeria">
+      <div class="container">
+        <div class="section-head">
+          <h2>Galeria realizacji.</h2>
+          <p>W prawdziwej wersji można tu dodać zdjęcia „przed i po”, Instagram albo prosty panel do podmiany zdjęć.</p>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-card"><div class="gallery-label">Metamorfoza blond</div></div>
+          <div class="gallery-card"><div class="gallery-label">Naturalne sombre</div></div>
+          <div class="gallery-card"><div class="gallery-label">Make-up + stylizacja</div></div>
+          <div class="gallery-card"><div class="gallery-label">Strzyżenie premium</div></div>
+          <div class="gallery-card"><div class="gallery-label">Pielęgnacja włosów</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Jak wygląda wizyta?</h2>
+          <p>Ta sekcja buduje zaufanie, bo klient wie, czego się spodziewać przed przyjściem do salonu.</p>
+        </div>
+        <div class="process-grid">
+          <article class="step">
+            <div class="step-number">1</div>
+            <h3>Konsultacja</h3>
+            <p>Sprawdzamy kondycję włosów, historię koloryzacji i oczekiwany efekt.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">2</div>
+            <h3>Plan usługi</h3>
+            <p>Dobieramy technikę, pielęgnację i orientacyjny czas wizyty.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">3</div>
+            <h3>Efekt i pielęgnacja</h3>
+            <p>Po zabiegu dostajesz wskazówki, jak utrzymać kolor i zdrowy wygląd.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing" id="cennik">
+      <div class="container">
+        <div class="section-head">
+          <h2>Przejrzysty cennik.</h2>
+          <p>Kwoty są przykładowe. Dobre demo pokazuje ceny „od”, bo finalna cena zależy od długości i stanu włosów.</p>
+        </div>
+        <div class="price-list">
+          <div class="price-item"><div><strong>Strzyżenie damskie</strong><span>mycie, cięcie, modelowanie</span></div><b>od 120 zł</b></div>
+          <div class="price-item"><div><strong>Strzyżenie męskie</strong><span>klasyczne lub skin fade</span></div><b>od 80 zł</b></div>
+          <div class="price-item"><div><strong>Koloryzacja globalna</strong><span>kolor + pielęgnacja</span></div><b>od 240 zł</b></div>
+          <div class="price-item"><div><strong>Sombre / Balayage</strong><span>naturalne przejścia koloru</span></div><b>od 380 zł</b></div>
+          <div class="price-item"><div><strong>Tonowanie blond</strong><span>ochłodzenie lub odświeżenie</span></div><b>od 160 zł</b></div>
+          <div class="price-item"><div><strong>Keratynowe wygładzanie</strong><span>wygładzenie i połysk</span></div><b>od 300 zł</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Poznaj stylistów.</h2>
+          <p>Ludzie kupują zaufaniem. Dlatego warto pokazać zespół, specjalizacje i zdjęcia osób pracujących w salonie.</p>
+        </div>
+        <div class="team-grid">
+          <article class="team-card">
+            <div class="team-photo"></div>
+            <h3>Maja</h3>
+            <p>Koloryzacje blond, sombre i naturalne refleksy.</p>
+          </article>
+          <article class="team-card">
+            <div class="team-photo"></div>
+            <h3>Ola</h3>
+            <p>Cięcia damskie, pielęgnacja i metamorfozy włosów.</p>
+          </article>
+          <article class="team-card">
+            <div class="team-photo"></div>
+            <h3>Adam</h3>
+            <p>Strzyżenie męskie, broda i klasyczne stylizacje.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="opinie">
+      <div class="container">
+        <div class="section-head">
+          <h2>Opinie klientek.</h2>
+          <p>Sekcja opinii mocno podnosi wiarygodność, szczególnie przy koloryzacjach i usługach premium.</p>
+        </div>
+        <div class="reviews-grid">
+          <article class="review">
+            <span class="stars">★★★★★</span>
+            <p>„Piękne przejście koloru, bez plam i bez przesuszenia włosów. Wszystko dokładnie wyjaśnione przed usługą.”</p>
+            <div class="client"><span class="avatar">A</span> Anna K.</div>
+          </article>
+          <article class="review">
+            <span class="stars">★★★★★</span>
+            <p>„Salon wygląda elegancko, terminy są jasne, a efekt po tonowaniu blond wygląda bardzo naturalnie.”</p>
+            <div class="client"><span class="avatar">M</span> Marta P.</div>
+          </article>
+          <article class="review">
+            <span class="stars">★★★★★</span>
+            <p>„Najlepsze cięcie od lat. Fryzura dobrze układa się sama, bez godziny przed lustrem.”</p>
+            <div class="client"><span class="avatar">K</span> Karolina W.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="booking" id="kontakt">
+      <div class="container">
+        <div class="booking-card">
+          <div class="booking-info">
+            <h2>Zarezerwuj wizytę.</h2>
+            <p>Formularz jest demo. W prawdziwej stronie można go podłączyć pod e-mail, Booksy, Calendly albo własny system zapisów.</p>
+          </div>
+          <form id="bookingForm">
+            <div class="form-row">
+              <label>Imię
+                <input type="text" name="name" placeholder="np. Anna" required>
+              </label>
+              <label>Telefon
+                <input type="tel" name="phone" placeholder="np. 500 300 200" required>
+              </label>
+            </div>
+            <label>Usługa
+              <select name="service" required>
+                <option value="">Wybierz usługę</option>
+                <option>Strzyżenie damskie</option>
+                <option>Strzyżenie męskie</option>
+                <option>Koloryzacja</option>
+                <option>Sombre / Balayage</option>
+                <option>Pielęgnacja / keratyna</option>
+              </select>
+            </label>
+            <div class="form-row">
+              <label>Preferowany dzień
+                <input type="date" name="date" required>
+              </label>
+              <label>Godzina
+                <input type="time" name="time" required>
+              </label>
+            </div>
+            <label>Wiadomość
+              <textarea name="message" rows="5" placeholder="Napisz, jaki efekt chcesz uzyskać"></textarea>
+            </label>
+            <button class="btn" type="submit">Wyślij zapytanie</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <a href="#kontakt" class="btn sticky-cta">Umów wizytę</a>
+
+  <footer>
+    <div class="container">
+      <div>
+        <strong>Lumière Hair Studio</strong>
+        <p>Demo strony internetowej dla salonu fryzjerskiego.</p>
+      </div>
+      <div>
+        <strong>Kontakt</strong>
+        <p>+48 500 300 200 • kontakt@lumiere-hair.pl</p>
+      </div>
+      <div>
+        <strong>Adres</strong>
+        <p>ul. Piękna 18, Warszawa</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const mobileBtn = document.querySelector('#mobileBtn');
+    const menu = document.querySelector('#menu');
+    mobileBtn.addEventListener('click', () => menu.classList.toggle('open'));
+
+    document.querySelectorAll('#menu a').forEach(link => {
+      link.addEventListener('click', () => menu.classList.remove('open'));
+    });
+
+    document.querySelector('#bookingForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      alert('Dziękujemy! To jest formularz demo. W prawdziwej stronie podłączymy wysyłkę na e-mail lub system rezerwacji.');
+    });
+  </script>
+</body>
+</html>
