@@ -4,6 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
 $ORDERS_STORE = __DIR__ . '/orders-data.php';
+$SITE_NAME = 'Kebab-demo';
 
 function respond($code, $data) {
   http_response_code($code);
@@ -52,7 +53,7 @@ if ($orderText === '') respond(400, array('ok' => false, 'error' => 'Brakuje zam
 if ($mode === 'Dostawa' && $address === '') respond(400, array('ok' => false, 'error' => 'Brakuje adresu dostawy'));
 if ($total <= 0) respond(400, array('ok' => false, 'error' => 'Błędna kwota zamówienia'));
 
-$orderId = 'KK-' . date('Ymd-His') . '-' . random_int(100, 999);
+$orderId = 'KD-' . date('Ymd-His') . '-' . random_int(100, 999);
 $isBlikPhone = ($paymentMethod === 'BLIK na telefon');
 $paymentStatus = $isBlikPhone ? 'oczekuje na płatność' : 'płatność przy odbiorze';
 $paymentUrl = $isBlikPhone ? 'payment-demo.php?order=' . rawurlencode($orderId) : '';
@@ -80,10 +81,10 @@ $historySaved = save_store($ORDERS_STORE, $orders);
 
 $host = preg_replace('/[^a-zA-Z0-9.-]/', '', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
 $from = 'no-reply@' . ($host ? $host : 'localhost');
-$subjectPlain = 'Nowe zamówienie ' . $orderId . ' - KebabKing';
+$subjectPlain = 'Nowe zamówienie ' . $orderId . ' - ' . $SITE_NAME;
 $subject = '=?UTF-8?B?' . base64_encode($subjectPlain) . '?=';
 
-$message = "Nowe zamówienie ze strony KebabKing\n";
+$message = "Nowe zamówienie ze strony " . $SITE_NAME . "\n";
 $message .= "=================================\n\n";
 $message .= "Numer: " . $orderId . "\n";
 $message .= "Data: " . $order['created_at'] . "\n";
@@ -97,7 +98,7 @@ if ($address !== '') $message .= "Adres: " . $address . "\n";
 $message .= "\nZamówienie:\n" . $orderText . "\n";
 
 $headers = array(
-  'From: KebabKing <' . $from . '>',
+  'From: ' . $SITE_NAME . ' <' . $from . '>',
   'Reply-To: ' . $from,
   'Content-Type: text/plain; charset=UTF-8',
   'X-Mailer: PHP/' . phpversion()
