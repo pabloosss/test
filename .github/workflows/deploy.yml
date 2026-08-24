@@ -1,0 +1,44 @@
+name: Deploy CyberForma to home.pl
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: cyberforma-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare website files
+        run: |
+          mkdir -p deploy
+          cp index.html style.css script.js demo-restauracja.html deploy/
+
+      - name: Install lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Deploy via SFTP
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+        run: |
+          lftp -u "$SFTP_USER","$SFTP_PASSWORD" "sftp://$SFTP_HOST:$SFTP_PORT" <<'EOF'
+          set sftp:auto-confirm yes
+          set net:max-retries 2
+          set net:timeout 20
+          mirror -R --delete --verbose --create-dirs deploy/ /public_html/cyberforma/
+          bye
+          EOF
