@@ -21,7 +21,7 @@ jobs:
       - name: Prepare website files
         run: |
           mkdir -p deploy
-          cp index.html style.css script.js demo-restauracja.html deploy/
+          cp index.html style.css script.js demo-restauracja.html przyklady.html deploy/
 
       - name: Install lftp
         run: |
